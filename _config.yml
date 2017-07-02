@@ -6,11 +6,12 @@
 # `jekyll serve`. If you change this file, please restart the server process.
 
 # Site Settings
+theme					 : minimal-mistakes-jekyll
 locale                   : "en"
-title                    : "Site Title"
+title                    : "Rank Deficient"
 title_separator          : "-"
-name                     : "Your Name"
-description              : "An amazing website."
+name                     : "Tim Dobbins"
+description              : "A website."
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -77,10 +78,10 @@ analytics:
 
 # Site Author
 author:
-  name             : "Your Name"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "I am an amazing person."
-  location         : "Somewhere"
+  name             : "Tim Dobbins"
+  avatar           : https://pbs.twimg.com/profile_images/785169714620301312/Oqu4RzeY_400x400.jpg
+  bio              : "Data scientist"
+  location         : "Nashville, TN"
   email            :
   uri              :
   bitbucket        :
