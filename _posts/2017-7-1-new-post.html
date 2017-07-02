@@ -1,10 +1,893 @@
 ---
-layout: home
-title: You're up and running!
+title: ModelTrackeR
+author_profile: true
+excerpt: This tool is designed to keep track of all changes made to your models, and to track any metrics you want to run on your models. For example if you make many changes to your model's formula, just run
 ---
 
-Next you can update your site name, avatar and other options using the _config.yml file in the root of your repository (shown below).
+<title>modeltracker</title>
 
-![_config.yml]({{ site.baseurl }}/images/config.png)
+  <div tabindex="-1" id="notebook" class="border-box-sizing">
+    <div class="container" id="notebook-container">
 
-The easiest way to make your first post is to edit this one. Go into /_posts/ and update the Hello World markdown file. For more instructions head over to the [Jekyll Now repository](https://github.com/barryclark/jekyll-now) on GitHub.
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="ModelTracker">ModelTracker<a class="anchor-link" href="#ModelTracker">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li><a href="#Description">Description</a></li>
+<li><a href="#Usage">Usage</a></li>
+<li><a href="#Arguments">Arguments</a></li>
+<li><a href="#Source-code">Source Code</a></li>
+<li><a href="#Read-in-data">Read in data</a></li>
+<li><a href="#ModelTracker-default-options">ModelTracker default options</a></li>
+<li><a href="#Custom-functions">Custom functions</a></li>
+<li><a href="#Custom-metrics">Custom metrics</a></li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Description">Description<a class="anchor-link" href="#Description">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This tool is designed to keep track of all changes made to your models, and to track any metrics you want to run on your models. For example if you make many changes to your model's formula, just run</p>
+<blockquote><p><code>track(model)</code></p>
+</blockquote>
+<p>after every iteration to store all the models you tested and it will track them, store them in a dataframe, and sort them by time. It can also keep track of metrics, functions you want to run on your model, and custom metrics.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Usage">Usage<a class="anchor-link" href="#Usage">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>track<span class="p">(</span>metrics<span class="p">,</span> metrics<span class="o">=</span><span class="kc">NULL</span><span class="p">,</span> customMetrics<span class="o">=</span><span class="kc">NULL</span><span class="p">,</span> <span class="kc">...</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Arguments">Arguments<a class="anchor-link" href="#Arguments">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code style="background-color: #f9f2f4;">metrics</code>&emsp;&emsp;&emsp;&emsp;&emsp; A list of strings that exist as attributes on the model.</p>
+<p><code style="background-color: #f9f2f4;">customFunctions</code>&emsp; A list of strings that exists as functions you have defined.</p>
+<p><code style="background-color: #f9f2f4;">...</code>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Additional arguments to be entered as new columns in the <code>MODELS</code> dataframe.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Source-code">Source code<a class="anchor-link" href="#Source-code">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="kn">library</span><span class="p">(</span>plyr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>dplyr<span class="p">)</span>
+
+track <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>model<span class="p">,</span> metrics<span class="o">=</span><span class="kc">NULL</span><span class="p">,</span> customFunctions<span class="o">=</span><span class="kc">NULL</span><span class="p">,</span> <span class="kc">...</span><span class="p">){</span>
+    
+    kwargs <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span><span class="kc">...</span><span class="p">);</span>
+    
+    environmentVars <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span>
+        datetime <span class="o">=</span> <span class="kp">format</span><span class="p">(</span><span class="kp">Sys.time</span><span class="p">(),</span> <span class="s">&quot;%Y-%m-%d %H:%M:%S&quot;</span><span class="p">),</span>
+        username <span class="o">=</span> <span class="kp">Sys.info</span><span class="p">()[[</span><span class="s">&quot;user&quot;</span><span class="p">]],</span>
+        className <span class="o">=</span> <span class="kp">class</span><span class="p">(</span>model<span class="p">)[[</span><span class="m">1</span><span class="p">]]</span>
+    <span class="p">)</span>
+    
+    form <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span>formula<span class="o">=</span><span class="kp">paste</span><span class="p">(</span><span class="kp">deparse</span><span class="p">(</span>formula<span class="p">(</span>model<span class="p">)),</span> collapse<span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">));</span>
+    
+    <span class="kr">for</span> <span class="p">(</span>env <span class="kr">in</span> <span class="kp">names</span><span class="p">(</span>environmentVars<span class="p">)){</span>
+        form<span class="p">[[</span>env<span class="p">]]</span> <span class="o">&lt;-</span>  environmentVars<span class="p">[[</span>env<span class="p">]];</span>
+    <span class="p">}</span>
+
+    <span class="kr">if</span> <span class="p">(</span><span class="o">!</span><span class="kp">is.null</span><span class="p">(</span>metrics<span class="p">)){</span>
+        <span class="kr">for</span> <span class="p">(</span>metric <span class="kr">in</span> metrics<span class="p">){</span>
+            form<span class="p">[[</span>metric<span class="p">]]</span>  <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>model<span class="p">)[[</span>metric<span class="p">]];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kr">if</span> <span class="p">(</span><span class="o">!</span><span class="kp">is.null</span><span class="p">(</span>customFunctions<span class="p">)){</span>
+        <span class="kr">for</span> <span class="p">(</span>cmetric <span class="kr">in</span> customFunctions<span class="p">){</span>
+            form<span class="p">[[</span>cmetric<span class="p">]]</span> <span class="o">&lt;-</span> <span class="kp">get</span><span class="p">(</span>cmetric<span class="p">)(</span>model<span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kr">for</span> <span class="p">(</span>arg <span class="kr">in</span> <span class="kp">names</span><span class="p">(</span>kwargs<span class="p">)){</span>
+        form<span class="p">[[</span>arg<span class="p">]]</span> <span class="o">&lt;-</span> kwargs<span class="p">[[</span>arg<span class="p">]];</span>
+    <span class="p">}</span>
+    
+    DIRTY_METRICS <span class="o">&lt;-</span> <span class="kc">FALSE</span><span class="p">;</span>
+    
+    <span class="kr">if</span> <span class="p">(</span><span class="kp">exists</span><span class="p">(</span><span class="s">&#39;METRICS_LIST&#39;</span><span class="p">)){</span>
+        
+        DIRTY_METRICS <span class="o">&lt;-</span> <span class="kc">FALSE</span> <span class="o">%in%</span> 
+            <span class="kp">unique</span><span class="p">(</span>
+                <span class="kp">append</span><span class="p">(</span>
+                    <span class="kp">names</span><span class="p">(</span>kwargs<span class="p">),</span> <span class="kp">unlist</span><span class="p">(</span>
+                        <span class="kp">append</span><span class="p">(</span>
+                            metrics<span class="p">,</span> customFunctions
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span> <span class="o">==</span> METRICS_LIST
+            <span class="p">)</span>
+        
+        <span class="kr">if</span> <span class="p">(</span>DIRTY_METRICS<span class="p">){</span>
+            MMODELS <span class="o">&lt;&lt;-</span> form<span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    
+    METRICS_LIST <span class="o">&lt;&lt;-</span> <span class="kp">append</span><span class="p">(</span>
+        <span class="kp">names</span><span class="p">(</span>kwargs<span class="p">),</span> <span class="kp">unlist</span><span class="p">(</span>
+            <span class="kp">append</span><span class="p">(</span>
+                metrics<span class="p">,</span> customFunctions
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="kr">if</span> <span class="p">(</span><span class="kp">exists</span><span class="p">(</span><span class="s">&#39;MODELS&#39;</span><span class="p">)){</span>
+        COUNTER <span class="o">&lt;&lt;-</span> COUNTER <span class="o">+</span> <span class="m">1</span><span class="p">;</span>
+    <span class="p">}</span> <span class="kr">else</span> <span class="p">{</span>
+        MODELS <span class="o">&lt;&lt;-</span> form<span class="p">;</span>
+        COUNTER <span class="o">&lt;&lt;-</span> <span class="m">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kr">if</span> <span class="p">(</span><span class="kp">exists</span><span class="p">(</span><span class="s">&#39;METRICS_LIST&#39;</span><span class="p">)</span> <span class="o">&amp;</span> DIRTY_METRICS<span class="p">){</span>
+
+        <span class="kr">for</span> <span class="p">(</span>env <span class="kr">in</span> <span class="kp">names</span><span class="p">(</span>environmentVars<span class="p">)){</span>
+            MMODELS<span class="p">[[</span>env<span class="p">]]</span> <span class="o">&lt;&lt;-</span>  environmentVars<span class="p">[[</span>env<span class="p">]];</span>
+        <span class="p">}</span>
+
+        <span class="kr">if</span> <span class="p">(</span><span class="o">!</span><span class="kp">is.null</span><span class="p">(</span>metrics<span class="p">)){</span>
+            <span class="kr">for</span> <span class="p">(</span>metric <span class="kr">in</span> metrics<span class="p">){</span>
+                MMODELS<span class="p">[[</span>metric<span class="p">]]</span>  <span class="o">&lt;&lt;-</span> <span class="kp">summary</span><span class="p">(</span>model<span class="p">)[[</span>metric<span class="p">]];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="kr">if</span> <span class="p">(</span><span class="o">!</span><span class="kp">is.null</span><span class="p">(</span>customFunctions<span class="p">)){</span>
+            <span class="kr">for</span> <span class="p">(</span>cmetric <span class="kr">in</span> customFunctions<span class="p">){</span>
+                MMODELS<span class="p">[[</span>cmetric<span class="p">]]</span> <span class="o">&lt;&lt;-</span> <span class="kp">get</span><span class="p">(</span>cmetric<span class="p">)(</span>model<span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="kr">for</span> <span class="p">(</span>arg <span class="kr">in</span> <span class="kp">names</span><span class="p">(</span>kwargs<span class="p">)){</span>
+            MMODELS<span class="p">[[</span>arg<span class="p">]]</span> <span class="o">&lt;&lt;-</span> kwargs<span class="p">[[</span>arg<span class="p">]];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    
+    <span class="kr">if</span> <span class="p">(</span>COUNTER <span class="o">&gt;</span> <span class="m">1</span><span class="p">){</span>
+        <span class="kr">if</span> <span class="p">(</span>DIRTY_METRICS<span class="p">){</span>
+            combinedDf <span class="o">&lt;-</span> rbind.fill<span class="p">(</span>MODELS<span class="p">,</span> MMODELS<span class="p">);</span>
+            MODELS <span class="o">&lt;&lt;-</span> combinedDf<span class="p">[</span><span class="kp">with</span><span class="p">(</span>combinedDf<span class="p">,</span> <span class="kp">order</span><span class="p">(</span>datetime<span class="p">,</span> decreasing<span class="o">=</span><span class="kc">TRUE</span><span class="p">)),];</span>
+        <span class="p">}</span> <span class="kr">else</span> <span class="p">{</span>
+            combinedDf <span class="o">&lt;-</span> rbind.fill<span class="p">(</span>MODELS<span class="p">,</span> form<span class="p">);</span>
+            MODELS <span class="o">&lt;&lt;-</span> combinedDf<span class="p">[</span><span class="kp">with</span><span class="p">(</span>combinedDf<span class="p">,</span> <span class="kp">order</span><span class="p">(</span>datetime<span class="p">,</span> decreasing<span class="o">=</span><span class="kc">TRUE</span><span class="p">)),];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="kr">return</span><span class="p">(</span>form<span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Read-in-data">Read in data<a class="anchor-link" href="#Read-in-data">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>df <span class="o">&lt;-</span> read.csv<span class="p">(</span><span class="s">&#39;middle_tn_schools.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span><span class="kp">head</span><span class="p">(</span>df<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th scope=col>name</th><th scope=col>school_rating</th><th scope=col>size</th><th scope=col>reduced_lunch</th><th scope=col>state_percentile_16</th><th scope=col>state_percentile_15</th><th scope=col>stu_teach_ratio</th><th scope=col>school_type</th><th scope=col>avg_score_15</th><th scope=col>avg_score_16</th><th scope=col>full_time_teachers</th><th scope=col>percent_black</th><th scope=col>percent_white</th><th scope=col>percent_asian</th><th scope=col>percent_hispanic</th></tr></thead>
+<tbody>
+	<tr><td>Allendale Elementary School   </td><td>5                             </td><td>851                           </td><td>10                            </td><td>90.2                          </td><td>95.8                          </td><td>15.7                          </td><td>Public                        </td><td>89.4                          </td><td>85.2                          </td><td>54                            </td><td> 2.9                          </td><td>85.5                          </td><td>1.6                           </td><td> 5.6                          </td></tr>
+	<tr><td>Anderson Elementary           </td><td>2                             </td><td>412                           </td><td>71                            </td><td>32.8                          </td><td>37.3                          </td><td>12.8                          </td><td>Public                        </td><td>43.0                          </td><td>38.3                          </td><td>32                            </td><td> 3.9                          </td><td>86.7                          </td><td>1.0                           </td><td> 4.9                          </td></tr>
+	<tr><td>Avoca Elementary              </td><td>4                             </td><td>482                           </td><td>43                            </td><td>78.4                          </td><td>83.6                          </td><td>16.6                          </td><td>Public                        </td><td>75.7                          </td><td>73.0                          </td><td>29                            </td><td> 1.0                          </td><td>91.5                          </td><td>1.2                           </td><td> 4.4                          </td></tr>
+	<tr><td>Bailey Middle                 </td><td>0                             </td><td>394                           </td><td>91                            </td><td> 1.6                          </td><td> 1.0                          </td><td>13.1                          </td><td>Public Magnet                 </td><td> 2.1                          </td><td> 4.4                          </td><td>30                            </td><td>80.7                          </td><td>11.7                          </td><td>2.3                           </td><td> 4.3                          </td></tr>
+	<tr><td>Barfield Elementary           </td><td>4                             </td><td>948                           </td><td>26                            </td><td>85.3                          </td><td>89.2                          </td><td>14.8                          </td><td>Public                        </td><td>81.3                          </td><td>79.6                          </td><td>64                            </td><td>11.8                          </td><td>71.2                          </td><td>7.1                           </td><td> 6.0                          </td></tr>
+	<tr><td>Barkers Mill Elementary School</td><td>4                             </td><td>893                           </td><td>48                            </td><td>78.1                          </td><td>76.4                          </td><td>13.9                          </td><td>Public                        </td><td>69.4                          </td><td>72.3                          </td><td>64                            </td><td>28.6                          </td><td>39.9                          </td><td>2.2                           </td><td>17.8                          </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="ModelTracker-default-options">ModelTracker default options<a class="anchor-link" href="#ModelTracker-default-options">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>By default, ModelTracker records your model's formula, the execution timestamp, the username, and the model's class name.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>model.lm <span class="o">&lt;-</span> lm<span class="p">(</span>avg_score_16 <span class="o">~</span> stu_teach_ratio <span class="o">+</span> school_type<span class="p">,</span> data<span class="o">=</span>df<span class="p">)</span>
+
+<span class="kp">summary</span><span class="p">(</span>model.lm<span class="p">)</span>
+
+track<span class="p">(</span>model.lm<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_text output_subarea ">
+<pre>
+Call:
+lm(formula = avg_score_16 ~ stu_teach_ratio + school_type, data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-64.817 -18.583   1.753  21.543  59.687 
+
+Coefficients:
+                           Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                  5.3802     8.6094   0.625 0.532438    
+stu_teach_ratio              3.5258     0.5578   6.321 8.10e-10 ***
+school_typePublic Charter    5.7192     9.3476   0.612 0.541051    
+school_typePublic Magnet   -15.5177     4.1378  -3.750 0.000207 ***
+school_typePublic Virtual -318.9387    59.4852  -5.362 1.52e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 26.08 on 342 degrees of freedom
+Multiple R-squared:  0.1403,	Adjusted R-squared:  0.1303 
+F-statistic: 13.96 on 4 and 342 DF,  p-value: 1.47e-10
+</pre>
+</div>
+
+</div>
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th scope=col>formula</th><th scope=col>datetime</th><th scope=col>username</th><th scope=col>className</th></tr></thead>
+<tbody>
+	<tr><td>avg_score_16 ~ stu_teach_ratio + school_type</td><td>2017-06-29 21:34:18                         </td><td>tdobbins                                    </td><td>lm                                          </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Details about the models you have tested are stored in <code>MODELS</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>MODELS
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th scope=col>formula</th><th scope=col>datetime</th><th scope=col>username</th><th scope=col>className</th></tr></thead>
+<tbody>
+	<tr><td>avg_score_16 ~ stu_teach_ratio + school_type</td><td>2017-06-29 21:34:18                         </td><td>tdobbins                                    </td><td>lm                                          </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Metrics">Metrics<a class="anchor-link" href="#Metrics">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>track</code> accepts an argument called <code>metrics</code>. This has to be an attribute that exists on your model's summary object. To extract it, put the attribute name in a list of strings like</p>
+<blockquote><p><code>list('r.squared', 'sigma')</code></p>
+</blockquote>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We'll also add another variable (<code>state_percentile_15</code>) to our formula to display how ModelTracker keeps track of the formulas.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>model.lm <span class="o">&lt;-</span> lm<span class="p">(</span>avg_score_16 <span class="o">~</span> stu_teach_ratio <span class="o">+</span> school_type <span class="o">+</span> state_percentile_15<span class="p">,</span> data<span class="o">=</span>df<span class="p">)</span>
+
+metrics <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span><span class="s">&#39;r.squared&#39;</span><span class="p">,</span> <span class="s">&#39;sigma&#39;</span><span class="p">)</span>
+
+<span class="kp">summary</span><span class="p">(</span>model.lm<span class="p">)</span>
+track<span class="p">(</span>model.lm<span class="p">,</span> metrics<span class="o">=</span>metrics<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_text output_subarea ">
+<pre>
+Call:
+lm(formula = avg_score_16 ~ stu_teach_ratio + school_type + state_percentile_15, 
+    data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-33.660  -5.444   0.069   5.711  41.670 
+
+Coefficients:
+                          Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                 8.5299     3.1113   2.742  0.00644 ** 
+stu_teach_ratio             0.1617     0.2132   0.759  0.44864    
+school_typePublic Charter  -3.1549     3.7291  -0.846  0.39814    
+school_typePublic Magnet   -2.0058     1.4565  -1.377  0.16939    
+school_typePublic Virtual   1.3703    22.3127   0.061  0.95107    
+state_percentile_15         0.7992     0.0161  49.651  &lt; 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 9.005 on 335 degrees of freedom
+  (6 observations deleted due to missingness)
+Multiple R-squared:  0.8972,	Adjusted R-squared:  0.8956 
+F-statistic: 584.5 on 5 and 335 DF,  p-value: &lt; 2.2e-16
+</pre>
+</div>
+
+</div>
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th scope=col>formula</th><th scope=col>datetime</th><th scope=col>username</th><th scope=col>className</th><th scope=col>r.squared</th><th scope=col>sigma</th></tr></thead>
+<tbody>
+	<tr><td>avg_score_16 ~ stu_teach_ratio + school_type + state_percentile_15</td><td>2017-06-29 21:34:23                                               </td><td>tdobbins                                                          </td><td>lm                                                                </td><td>0.8971659                                                         </td><td>9.00481                                                           </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Notice our <code>MODELS</code> object now contains two additional metrics, r.squared and sigma. The first model, since it wasn't tracking those metrics, shows NA for those values.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>MODELS
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th></th><th scope=col>formula</th><th scope=col>datetime</th><th scope=col>username</th><th scope=col>className</th><th scope=col>r.squared</th><th scope=col>sigma</th></tr></thead>
+<tbody>
+	<tr><th scope=row>2</th><td>avg_score_16 ~ stu_teach_ratio + school_type + state_percentile_15</td><td>2017-06-29 21:34:23                                               </td><td>tdobbins                                                          </td><td>lm                                                                </td><td>0.8971659                                                         </td><td>9.00481                                                           </td></tr>
+	<tr><th scope=row>1</th><td>avg_score_16 ~ stu_teach_ratio + school_type                      </td><td>2017-06-29 21:34:18                                               </td><td>tdobbins                                                          </td><td>lm                                                                </td><td>       NA                                                         </td><td>     NA                                                           </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Custom-functions">Custom functions<a class="anchor-link" href="#Custom-functions">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>ModelTracker also accepts an argument called <code>customFunctions</code>. This is for defining custom functions that accept the model as input and return a single value. Be sure that the functions only accept one argument, your model.</p>
+<p>For example, I define two functions, <code>getr2</code> and <code>getFstat</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>getr2 <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>model<span class="p">){</span>
+    <span class="kr">return</span><span class="p">(</span><span class="kp">summary</span><span class="p">(</span>model<span class="p">)</span><span class="o">$</span>r.squared<span class="p">);</span>
+<span class="p">}</span>
+
+getFstat <span class="o">&lt;-</span> <span class="kr">function</span><span class="p">(</span>model<span class="p">){</span>
+    <span class="kr">return</span><span class="p">(</span><span class="kp">summary</span><span class="p">(</span>model<span class="p">)</span><span class="o">$</span>fstatistic<span class="p">[[</span><span class="s">&#39;value&#39;</span><span class="p">]])</span>
+<span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now I will create a list and put my custom functions in them then pass them to <code>track</code>. Note, you must specify them as strings.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>model.lm <span class="o">&lt;-</span> lm<span class="p">(</span>avg_score_16 <span class="o">~</span> reduced_lunch <span class="o">+</span> poly<span class="p">(</span>size<span class="p">,</span> <span class="m">2</span><span class="p">),</span> data<span class="o">=</span>df<span class="p">)</span>
+
+<span class="kp">summary</span><span class="p">(</span>model.lm<span class="p">)</span>
+
+customFunctions <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span><span class="s">&#39;getr2&#39;</span><span class="p">,</span> <span class="s">&#39;getFstat&#39;</span><span class="p">)</span>
+track<span class="p">(</span>model.lm<span class="p">,</span> customFunctions<span class="o">=</span>customFunctions<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_text output_subarea ">
+<pre>
+Call:
+lm(formula = avg_score_16 ~ reduced_lunch + poly(size, 2), data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-45.168 -10.779  -1.083  10.450  58.887 
+
+Coefficients:
+                Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)    103.22970    1.97690  52.218  &lt; 2e-16 ***
+reduced_lunch   -0.91846    0.03541 -25.935  &lt; 2e-16 ***
+poly(size, 2)1 -46.38692   16.66492  -2.784  0.00568 ** 
+poly(size, 2)2 -19.69939   16.12389  -1.222  0.22264    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 16 on 343 degrees of freedom
+Multiple R-squared:  0.6756,	Adjusted R-squared:  0.6728 
+F-statistic: 238.1 on 3 and 343 DF,  p-value: &lt; 2.2e-16
+</pre>
+</div>
+
+</div>
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th scope=col>formula</th><th scope=col>datetime</th><th scope=col>username</th><th scope=col>className</th><th scope=col>getr2</th><th scope=col>getFstat</th></tr></thead>
+<tbody>
+	<tr><td>avg_score_16 ~ reduced_lunch + poly(size, 2)</td><td>2017-06-29 21:38:37                         </td><td>tdobbins                                    </td><td>lm                                          </td><td>0.6756111                                   </td><td>238.1242                                    </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Notice that the <code>MODELS</code> object sorts your models by time in descending order.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>MODELS
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th></th><th scope=col>formula</th><th scope=col>datetime</th><th scope=col>username</th><th scope=col>className</th><th scope=col>r.squared</th><th scope=col>sigma</th><th scope=col>getr2</th><th scope=col>getFstat</th></tr></thead>
+<tbody>
+	<tr><th scope=row>3</th><td>avg_score_16 ~ reduced_lunch + poly(size, 2)                      </td><td>2017-06-29 21:38:37                                               </td><td>tdobbins                                                          </td><td>lm                                                                </td><td>       NA                                                         </td><td>     NA                                                           </td><td>0.6756111                                                         </td><td>238.1242                                                          </td></tr>
+	<tr><th scope=row>1</th><td>avg_score_16 ~ stu_teach_ratio + school_type + state_percentile_15</td><td>2017-06-29 21:34:23                                               </td><td>tdobbins                                                          </td><td>lm                                                                </td><td>0.8971659                                                         </td><td>9.00481                                                           </td><td>       NA                                                         </td><td>      NA                                                          </td></tr>
+	<tr><th scope=row>2</th><td>avg_score_16 ~ stu_teach_ratio + school_type                      </td><td>2017-06-29 21:34:18                                               </td><td>tdobbins                                                          </td><td>lm                                                                </td><td>       NA                                                         </td><td>     NA                                                           </td><td>       NA                                                         </td><td>      NA                                                          </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Custom-metrics">Custom metrics<a class="anchor-link" href="#Custom-metrics">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, my favorite. This feature lets you track any metric by calculating it before running <code>track</code> and then just inputting the value into our <code>track</code> call.</p>
+<p>For instance, here I calculate <code>pseudoR2</code> and retrieve the coefficient for <code>reduced_lunch</code>. Then I add them to <code>track</code> using whatever names I want; here I use <code>pseudoR2</code> and <code>reducedLunchCoef</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>model.glm <span class="o">&lt;-</span> glm<span class="p">(</span>avg_score_16 <span class="o">~</span> <span class="kp">I</span><span class="p">(</span>reduced_lunch<span class="o">^</span><span class="m">2</span><span class="p">)</span> <span class="o">+</span> <span class="kp">sqrt</span><span class="p">(</span>size<span class="p">)</span> <span class="o">+</span> <span class="kp">factor</span><span class="p">(</span>school_type<span class="p">),</span>
+                 data<span class="o">=</span>df<span class="p">)</span>
+
+<span class="kp">summary</span><span class="p">(</span>model.glm<span class="p">)</span>
+
+pseudoR2 <span class="o">&lt;-</span> <span class="m">1</span><span class="o">-</span><span class="p">(</span>model.glm<span class="o">$</span>deviance<span class="o">/</span>model.glm<span class="o">$</span>null.deviance<span class="p">)</span>
+reducedLunchCoef <span class="o">&lt;-</span> <span class="kp">summary</span><span class="p">(</span>model.glm<span class="p">)</span><span class="o">$</span>coefficients<span class="p">[</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">]</span>
+
+track<span class="p">(</span>model.glm<span class="p">,</span> pseudoR2<span class="o">=</span>pseudoR2<span class="p">,</span> reducedLunchCoef<span class="o">=</span>reducedLunchCoef<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_text output_subarea ">
+<pre>
+Call:
+glm(formula = avg_score_16 ~ I(reduced_lunch^2) + sqrt(size) + 
+    factor(school_type), data = df)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-45.657   -9.101    0.439    9.698   45.115  
+
+Coefficients:
+                                    Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                       92.5334745  3.6667864  25.236  &lt; 2e-16 ***
+I(reduced_lunch^2)                -0.0093298  0.0003373 -27.662  &lt; 2e-16 ***
+sqrt(size)                        -0.2344695  0.1221849  -1.919   0.0558 .  
+factor(school_type)Public Charter 33.3718677  5.5360610   6.028 4.31e-09 ***
+factor(school_type)Public Magnet  -4.7844382  2.4292237  -1.970   0.0497 *  
+factor(school_type)Public Virtual -4.4385146 15.2299952  -0.291   0.7709    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 228.2756)
+
+    Null deviance: 270663  on 346  degrees of freedom
+Residual deviance:  77842  on 341  degrees of freedom
+AIC: 2877.1
+
+Number of Fisher Scoring iterations: 2
+</pre>
+</div>
+
+</div>
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th scope=col>formula</th><th scope=col>datetime</th><th scope=col>username</th><th scope=col>className</th><th scope=col>pseudoR2</th><th scope=col>reducedLunchCoef</th></tr></thead>
+<tbody>
+	<tr><td>avg_score_16 ~ I(reduced_lunch^2) + sqrt(size) + factor(school_type)</td><td>2017-06-29 21:43:12                                                 </td><td>tdobbins                                                            </td><td>glm                                                                 </td><td>0.7124028                                                           </td><td>-0.009329825                                                        </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Whatever name you pass to <code>track</code> will show up as the column name.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>MODELS
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th></th><th scope=col>formula</th><th scope=col>datetime</th><th scope=col>username</th><th scope=col>className</th><th scope=col>r.squared</th><th scope=col>sigma</th><th scope=col>getr2</th><th scope=col>getFstat</th><th scope=col>pseudoR2</th><th scope=col>reducedLunchCoef</th></tr></thead>
+<tbody>
+	<tr><th scope=row>4</th><td>avg_score_16 ~ I(reduced_lunch^2) + sqrt(size) + factor(school_type)</td><td>2017-06-29 21:43:12                                                 </td><td>tdobbins                                                            </td><td>glm                                                                 </td><td>       NA                                                           </td><td>     NA                                                             </td><td>       NA                                                           </td><td>      NA                                                            </td><td>0.7124028                                                           </td><td>-0.009329825                                                        </td></tr>
+	<tr><th scope=row>1</th><td>avg_score_16 ~ reduced_lunch + poly(size, 2)                        </td><td>2017-06-29 21:38:37                                                 </td><td>tdobbins                                                            </td><td>lm                                                                  </td><td>       NA                                                           </td><td>     NA                                                             </td><td>0.6756111                                                           </td><td>238.1242                                                            </td><td>       NA                                                           </td><td>          NA                                                        </td></tr>
+	<tr><th scope=row>2</th><td>avg_score_16 ~ stu_teach_ratio + school_type + state_percentile_15  </td><td>2017-06-29 21:34:23                                                 </td><td>tdobbins                                                            </td><td>lm                                                                  </td><td>0.8971659                                                           </td><td>9.00481                                                             </td><td>       NA                                                           </td><td>      NA                                                            </td><td>       NA                                                           </td><td>          NA                                                        </td></tr>
+	<tr><th scope=row>3</th><td>avg_score_16 ~ stu_teach_ratio + school_type                        </td><td>2017-06-29 21:34:18                                                 </td><td>tdobbins                                                            </td><td>lm                                                                  </td><td>       NA                                                           </td><td>     NA                                                             </td><td>       NA                                                           </td><td>      NA                                                            </td><td>       NA                                                           </td><td>          NA                                                        </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-r"><pre><span></span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+    </div>
+  </div>
+  
