@@ -8,9 +8,9 @@
 # Site Settings
 theme					 : minimal-mistakes-jekyll
 locale                   : "en"
-title                    : "Rank Deficient"
+title                    : "rank deficient"
 title_separator          : "-"
-name                     : "Tim Dobbins"
+name                     : "tim dobbins"
 description              : "A website."
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
@@ -78,10 +78,10 @@ analytics:
 
 # Site Author
 author:
-  name             : "Tim Dobbins"
+  name             : "tim dobbins"
   avatar           : https://pbs.twimg.com/profile_images/785169714620301312/Oqu4RzeY_400x400.jpg
-  bio              : "Data scientist"
-  location         : "Nashville, TN"
+  bio              : "data scientist | software engineer"
+  location         : "nashville, tn"
   email            :
   uri              :
   bitbucket        :
