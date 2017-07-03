@@ -9321,10 +9321,11 @@ div.cell.selected.jupyter-soft-selected {
 }
 .prompt {
   /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
-  min-width: 14ex;
+  /*min-width: 14ex;*/
   /* This padding is tuned to match the padding on the CodeMirror editor. */
   padding: 0.4em;
   margin: 0px;
+  width: 7%;
   /*font-family: monospace;*/
   text-align: right;
   /* This has to match that of the the CodeMirror class line-height below */
@@ -9836,7 +9837,7 @@ div.output_subarea {
   box-flex: 1;
   /* Modern browsers */
   flex: 1;
-  max-width: calc(100% - 14ex);
+  /*max-width: calc(100% - 14ex);*/
 }
 div.output_scroll div.output_subarea {
   overflow-x: visible;
