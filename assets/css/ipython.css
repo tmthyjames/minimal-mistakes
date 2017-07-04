@@ -10245,7 +10245,7 @@ pre,
 code,
 kbd,
 samp {
-  white-space: pre-wrap;
+  /*white-space: pre-wrap;*/
 }
 #fonttest {
   /*font-family: monospace;*/
@@ -11750,4 +11750,8 @@ div#notebook {
 }
 .page {
 	padding-right: 0px !important;
+}
+
+.input_area, .output_area {
+	max-width:95%;
 }
