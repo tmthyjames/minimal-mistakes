@@ -1355,7 +1355,7 @@ kbd kbd {
 pre {
   display: block;
   padding: 8.5px;
-  margin: 0 0 9px;
+  margin: 0 0 0px;
   font-size: 12px;
   line-height: 1.42857143;
   word-break: break-all;
@@ -9323,8 +9323,8 @@ div.cell.selected.jupyter-soft-selected {
   /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
   /*min-width: 14ex;*/
   /* This padding is tuned to match the padding on the CodeMirror editor. */
-  padding: 0.4em;
-  margin: 0px;
+  /*padding: 0.4em;*/
+  margin-right: 5px;
   width: 7%;
   /*font-family: monospace;*/
   text-align: right;
