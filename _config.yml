@@ -8,8 +8,8 @@
 # Site Settings
 theme					 : minimal-mistakes-jekyll
 locale                   : "en"
-title                    : "rank deficient"
-title_separator          : "-"
+title                    : "timothy's prior"
+title_separator          : "|"
 name                     : "tim dobbins"
 description              : "A data science blog."
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
