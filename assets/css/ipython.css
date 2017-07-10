@@ -9278,6 +9278,9 @@ div.cell {
   padding-left: 5px;
   background: linear-gradient(to right, transparent -40px, transparent 1px, transparent 1px, transparent 100%);
 }
+div.inner_cell {
+	max-width: 90%;
+}
 div.cell.jupyter-soft-selected {
   border-left-color: #90CAF9;
   border-left-color: #E3F2FD;
