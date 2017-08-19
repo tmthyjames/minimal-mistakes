@@ -8,9 +8,9 @@
 # Site Settings
 theme					 : minimal-mistakes-jekyll
 locale                   : "en"
-title                    : "timothy's prior"
+title                    : "tmthyjames"
 title_separator          : "|"
-name                     : "tim dobbins"
+name                     : "Timothy James Dobbins"
 description              : "A data science blog."
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
@@ -78,7 +78,7 @@ analytics:
 
 # Site Author
 author:
-  name             : "tim dobbins"
+  name             : "Timothy James Dobbins"
   avatar           : https://pbs.twimg.com/profile_images/785169714620301312/Oqu4RzeY_400x400.jpg
   bio              : "data scientist | software engineer"
   location         : "nashville, tn"
