@@ -1,0 +1,130 @@
+---
+title: "Cypher: A Quick Way to Retrieve Music Lyrics"
+author_profile: true
+author: Tim Dobbins
+excerpt: Introducing a new library to retrieve music lyrics without having to scrape the site.
+categories: [tools]
+tags: [python, web-scraping]
+---
+<link rel="stylesheet" type="text/css" href="/assets/css/ipython.css"><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59027px; left: 5.59028px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 61px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-link">[Cypher]</span><span class="cm-string cm-url">(https://github.com/tmthyjames/cypher)</span> is a new <span class="cm-comment">`pip`</span>-installable library that retrieves music lyrics without having to scrape the site yourself. If you want an artist's lyrics, just do the following:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 91px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p><a href="https://github.com/tmthyjames/cypher" target="_blank">Cypher</a> is a new <code>pip</code>-installable library that retrieves music lyrics without having to scrape the site yourself. If you want an artist's lyrics, just do the following:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[1]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.5903px; left: 5.59028px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 249.25px; margin-bottom: 0px; border-right-width: 30px; min-height: 78px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword cm-cm-overlay cm-matchhighlight">import</span> <span class="cm-variable">thecypher</span> <span class="cm-keyword">as</span> <span class="cm-variable">cy</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">coasts</span> = <span class="cm-variable">cy</span>.<span class="cm-property">get_lyrics</span>(<span class="cm-string">'coasts'</span>)</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">coasts</span>[<span class="cm-number">0</span>]</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 108px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea"></div></div><div class="output_wrapper"><div class=" prompt" title="click to scroll output; double click to hide" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt"></div><div class="output_subarea output_text output_stream output_stderr"><pre>
+2018-01-27 21:34:11,242 : INFO : GET Artist URL: <a target="_blank" href="http://lyrics.wikia.com/wiki/Coasts">http://lyrics.wikia.com/wiki/Coasts</a>
+2018-01-27 21:34:11,332 : INFO : GET Artist Album: Coasts (2016)
+2018-01-27 21:34:12,362 : INFO : GET Artist Album Successful: Coasts (2016)
+2018-01-27 21:34:12,363 : INFO : GET Artist Album: Misc (0000)
+2018-01-27 21:34:12,364 : INFO : GET Artist Album Successful: Misc (0000)
+</pre></div></div><div class="output_area"><div class="prompt output_prompt">Out[1]:</div><div class="output_subarea output_text output_result"><pre>{'album': 'Coasts (2016)',
+ 'artist': 'coasts',
+ 'genre': 'Indie_Pop',
+ 'id': 0,
+ 'lyric': 'We fell in love',
+ 'song': 'Oceans',
+ 'year': '2016'}</pre></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59027px; left: 5.59028px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 61px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">That's it. You now have all of the lyrics for <span class="cm-link">[Coasts]</span><span class="cm-string cm-url">(http://www.coastsband.com/)</span> available on <span class="cm-link">[LyricWiki]</span><span class="cm-string cm-url">(http://lyrics.wikia.com/)</span>. If you want to convert this to a pandas <span class="cm-comment">`DataFrame`</span> then just do the following: </span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 91px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>That's it. You now have all of the lyrics for <a href="http://www.coastsband.com/" target="_blank">Coasts</a> available on <a href="http://lyrics.wikia.com/" target="_blank">LyricWiki</a>. If you want to convert this to a pandas <code>DataFrame</code> then just do the following: </p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[2]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59027px; left: 5.59028px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 249.267px; margin-bottom: 0px; border-right-width: 30px; min-height: 78px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword cm-cm-overlay cm-matchhighlight">import</span> <span class="cm-variable">pandas</span> <span class="cm-keyword">as</span> <span class="cm-variable">pd</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">coasts_df</span> = <span class="cm-variable">pd</span>.<span class="cm-property">DataFrame</span>(<span class="cm-variable">coasts</span>)</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">coasts_df</span>.<span class="cm-property">head</span>()</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 108px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[2]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>album</th>
+      <th>artist</th>
+      <th>genre</th>
+      <th>id</th>
+      <th>lyric</th>
+      <th>song</th>
+      <th>year</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Coasts (2016)</td>
+      <td>coasts</td>
+      <td>Indie_Pop</td>
+      <td>0</td>
+      <td>We fell in love</td>
+      <td>Oceans</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Coasts (2016)</td>
+      <td>coasts</td>
+      <td>Indie_Pop</td>
+      <td>1</td>
+      <td>Right by the ocean</td>
+      <td>Oceans</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Coasts (2016)</td>
+      <td>coasts</td>
+      <td>Indie_Pop</td>
+      <td>2</td>
+      <td>Made all our plans</td>
+      <td>Oceans</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Coasts (2016)</td>
+      <td>coasts</td>
+      <td>Indie_Pop</td>
+      <td>3</td>
+      <td>Down on the sand</td>
+      <td>Oceans</td>
+      <td>2016</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Coasts (2016)</td>
+      <td>coasts</td>
+      <td>Indie_Pop</td>
+      <td>4</td>
+      <td>And from the tips of your fingers</td>
+      <td>Oceans</td>
+      <td>2016</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59033px; left: 5.59028px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 44px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">By default, the data is delivered with one lyric per row. The following code will convert it to one song per row:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 74px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>By default, the data is delivered with one lyric per row. The following code will convert it to one song per row:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[3]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59021px; left: 5.59028px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 403.139px; margin-bottom: 0px; border-right-width: 30px; min-height: 128px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable cm-cm-overlay cm-matchhighlight">group</span> = [<span class="cm-string">'song'</span>, <span class="cm-string">'year'</span>, <span class="cm-string">'album'</span>, <span class="cm-string">'genre'</span>, <span class="cm-string">'artist'</span>]</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">coasts_by_song</span> = <span class="cm-variable">coasts_df</span>.<span class="cm-property">sort_values</span>(<span class="cm-variable cm-cm-overlay cm-matchhighlight">group</span>)<span class="cm-error">\</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">       .<span class="cm-property">groupby</span>(<span class="cm-variable cm-cm-overlay cm-matchhighlight">group</span>).<span class="cm-property">lyric</span><span class="cm-error">\</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">       .<span class="cm-property">apply</span>(<span class="cm-string">' '</span>.<span class="cm-property">join</span>)<span class="cm-error">\</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">       <span class="cm-null cm-error">.</span><span class="cm-property">reset_index</span>(<span class="cm-variable">name</span>=<span class="cm-string">'lyric'</span>)</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">    </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">coasts_by_song</span>.<span class="cm-property">head</span>(<span class="cm-number">2</span>)</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 158px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[3]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>song</th>
+      <th>year</th>
+      <th>album</th>
+      <th>genre</th>
+      <th>artist</th>
+      <th>lyric</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A Rush of Blood</td>
+      <td>2016</td>
+      <td>Coasts (2016)</td>
+      <td>Indie_Pop</td>
+      <td>coasts</td>
+      <td>Are you looking for something? Are you searching for someone else? You say I feel better at midnight Because the moon is your only friend And I want you bad, Oh I knew that you wouldn't wanna go without I could be your hero, if you want me to You've got to show me how Like a rush of blood to the head You were crushing hearts till the end Like a rush of blood to the head You were crushing hearts till the end I'm a dreamer, I wanna be a better man I'll never be all that you wanted, But I'll give you everything that I can Like the greatest rush that you've ever felt When we hear the sound I could be your hero, if you want me to You've got to show me how Like a rush of blood to the head You were crushing hearts till the end Was a young love lost in the night Are we in too deep to decide? Put the beat in my heart, the words in my mouth Kept me out of the dark You put the taste I my tongue, the life in my soul Gave me air for my lungs Like a rush of blood to the head You were crushing hearts till the end Was a young love lost in the night Are we in too deep to decide?</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>As Long as I Need You</td>
+      <td>2016</td>
+      <td>Coasts (2016)</td>
+      <td>Indie_Pop</td>
+      <td>coasts</td>
+      <td>As long as I need you For long as I want to I'll be your sole lover You'll be my only other Now we're chewing the fat Trying to get to the good stuff Breaking it up cause you know this is tough love Spending our nights in different places Keeping it live with the thrill of the chase As long as I need you For as long as I want to Now you've got no soul, never showing emotion Breaking me down, just a silent devotion Breathing deep to get a bit higher Color our cheeks the light of a fire It's getting easier to make out The words spilled from your mouth And at the end of the winter You said you'd love me forever Don't let the light go out Don't leave without a sound Don't let the light go out Don't leave without a sound The backseat of your car Three words taken too far By the end of the summer We were walking on water Don't let the light go out Don't leave without a sound Don't let the light go out Don't leave without a sound</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59021px; left: 5.59028px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 144px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Keep in mind that these lyrics are community generated and are not perfect (or complete in some instances), but I think LyricWiki is one of the best lyrics sites there is. </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">I plan to convert this to a RESTful API and add more flexibility eventually. But for now, what you see is what you get. Enjoy!</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">To install with <span class="cm-comment">`pip`</span>:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 174px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>Keep in mind that these lyrics are community generated and are not perfect (or complete in some instances), but I think LyricWiki is one of the best lyrics sites there is. </p>
+<p>I plan to convert this to a RESTful API and add more flexibility eventually. But for now, what you see is what you get. Enjoy!</p>
+<p>To install with <code>pip</code>:</p>
+</div></div></div><div class="cell text_cell un unrendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59033px; left: 5.59028px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">pip install thecypher</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"></div></div></div>
