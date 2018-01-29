@@ -39,7 +39,7 @@ tags: [python, machine-learning, data-science]
                                     <div style="position: relative; z-index: 1;"></div>
                                     <div class="CodeMirror-cursors"></div>
                                     <div class="CodeMirror-code">
-                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">In this post, we'll analyze lyrics from the best rappers of all time. To do this, we'll use Python and <span class="cm-link">[gensim's]</span><span class="cm-string cm-url">(https://radimrehurek.com/gensim/)</span> implementation of the <span class="cm-link">[Doc2Vec]</span><span class="cm-string cm-url">(https://arxiv.org/abs/1405.4053)</span> algortithm. To get the data, we'll use <span class="cm-link">[Cypher]</span><span class="cm-string cm-url">(https://github.com/tmthyjames/cypher)</span>, a new Python package <span class="cm-link">[I recently released]</span><span class="cm-string cm-url">(https://tmthyjames.github.io/tools/Cypher/)</span> that retrieves music lyrics.</span></pre>
+                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">In this post, we'll analyze lyrics from the best rappers of all time. To do this, we'll use Python and <span class="cm-link">[gensim's]</span><span class="cm-string cm-url">(https://radimrehurek.com/gensim/)</span> implementation of the <span class="cm-link">[Doc2Vec]</span><span class="cm-string cm-url">(https://arxiv.org/abs/1405.4053)</span> algorithm. To get the data, we'll use <span class="cm-link">[Cypher]</span><span class="cm-string cm-url">(https://github.com/tmthyjames/cypher)</span>, a new Python package <span class="cm-link">[I recently released]</span><span class="cm-string cm-url">(https://tmthyjames.github.io/tools/Cypher/)</span> that retrieves music lyrics.</span></pre>
                                     </div>
                                 </div>
                             </div>
@@ -50,7 +50,7 @@ tags: [python, machine-learning, data-science]
             </div>
         </div>
         <div class="text_cell_render rendered_html" tabs="-1">
-            <p>In this post, we'll analyze lyrics from the best rappers of all time. To do this, we'll use Python and <a href="https://radimrehurek.com/gensim/" target="_blank">gensim's</a> implementation of the <a href="https://arxiv.org/abs/1405.4053" target="_blank">Doc2Vec</a> algortithm. To get the data, we'll use <a href="https://github.com/tmthyjames/cypher" target="_blank">Cypher</a>, a new Python package <a href="https://tmthyjames.github.io/tools/Cypher/" target="_blank">I recently released</a> that retrieves music lyrics.</p>
+            <p>In this post, we'll analyze lyrics from the best rappers of all time. To do this, we'll use Python and <a href="https://radimrehurek.com/gensim/" target="_blank">gensim's</a> implementation of the <a href="https://arxiv.org/abs/1405.4053" target="_blank">Doc2Vec</a> algorithm. To get the data, we'll use <a href="https://github.com/tmthyjames/cypher" target="_blank">Cypher</a>, a new Python package <a href="https://tmthyjames.github.io/tools/Cypher/" target="_blank">I recently released</a> that retrieves music lyrics.</p>
         </div>
     </div>
 </div>
@@ -77,14 +77,14 @@ tags: [python, machine-learning, data-science]
                                     <div class="CodeMirror-code" style="">
                                         <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-2">## Contents</span></span></pre>
                                         <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre>
-                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Doc2Vec Summary]</span><span class="cm-string cm-url">(#Quick-Note-on-Doc2Vec)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
+                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Quick Note On Doc2Vec]</span><span class="cm-string cm-url">(#Quick-Note-on-Doc2Vec)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
                                         <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Getting the Data]</span><span class="cm-string cm-url">(#Getting-the-Data)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
                                         <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Loading the Data]</span><span class="cm-string cm-url">(#Loading-the-Data)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
                                         <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Initializing the Model]</span><span class="cm-string cm-url">(#Initializing-the-Model)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
                                         <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Training the Model]</span><span class="cm-string cm-url">(#Training-the-Model)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
                                         <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Finding Most Similar Words]</span><span class="cm-string cm-url">(#Finding-Most-Similar-Words)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
                                         <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Finding Most Similar Documents]</span><span class="cm-string cm-url">(#Finding-Most-Similar-Documents)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
-                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Infering Vectors]</span><span class="cm-string cm-url">(#Infering-Vectors)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
+                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Inferring Vectors]</span><span class="cm-string cm-url">(#Inferring-Vectors)</span><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">br</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre>
                                         <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• <span class="cm-link">[Up Next]</span><span class="cm-string cm-url">(#Up-Next)</span></span></pre>
                                     </div>
                                 </div>
@@ -97,14 +97,14 @@ tags: [python, machine-learning, data-science]
         </div>
         <div class="text_cell_render rendered_html" tabs="-1">
             <h2 id="Contents">Contents<a class="anchor-link" href="#Contents">¶</a></h2>
-            <p>• <a href="#Quick-Note-on-Doc2Vec">Doc2Vec Summary</a><br>
+            <p>• <a href="#Quick-Note-on-Doc2Vec">Quick Note On Doc2Vec</a><br>
                 • <a href="#Getting-the-Data">Getting the Data</a><br>
                 • <a href="#Loading-the-Data">Loading the Data</a><br>
                 • <a href="#Initializing-the-Model">Initializing the Model</a><br>
                 • <a href="#Training-the-Model">Training the Model</a><br>
                 • <a href="#Finding-Most-Similar-Words">Finding Most Similar Words</a><br>
                 • <a href="#Finding-Most-Similar-Documents">Finding Most Similar Documents</a><br>
-                • <a href="#Infering-Vectors">Infering Vectors</a><br>
+                • <a href="#Inferring-Vectors">Inferring Vectors</a><br>
                 • <a href="#Up-Next">Up Next</a>
             </p>
         </div>
@@ -2173,7 +2173,7 @@ tags: [python, machine-learning, data-science]
                                     <div style="position: relative; z-index: 1;"></div>
                                     <div class="CodeMirror-cursors"></div>
                                     <div class="CodeMirror-code">
-                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">The next one is probably the most fasinating result. When our target word is "church", we get results that clearly have an element of "church" in them. Just look at the first two results, The Game's Hallelujah and Ice Cube's When I Get to Heaven. </span></pre>
+                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">The next one is probably the most fascinating result. When our target word is "church", we get results that clearly have an element of "church" in them. Just look at the first two results, The Game's Hallelujah and Ice Cube's When I Get to Heaven. </span></pre>
                                     </div>
                                 </div>
                             </div>
@@ -2184,7 +2184,7 @@ tags: [python, machine-learning, data-science]
             </div>
         </div>
         <div class="text_cell_render rendered_html" tabs="-1">
-            <p>The next one is probably the most fasinating result. When our target word is "church", we get results that clearly have an element of "church" in them. Just look at the first two results, The Game's Hallelujah and Ice Cube's When I Get to Heaven. </p>
+            <p>The next one is probably the most fascinating result. When our target word is "church", we get results that clearly have an element of "church" in them. Just look at the first two results, The Game's Hallelujah and Ice Cube's When I Get to Heaven. </p>
         </div>
     </div>
 </div>
@@ -2444,7 +2444,7 @@ tags: [python, machine-learning, data-science]
                                     <div style="position: relative; z-index: 1;"></div>
                                     <div class="CodeMirror-cursors"></div>
                                     <div class="CodeMirror-code">
-                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-2">## Infering Vectors</span></span></pre>
+                                        <pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-2">## Inferring Vectors</span></span></pre>
                                     </div>
                                 </div>
                             </div>
@@ -2455,7 +2455,7 @@ tags: [python, machine-learning, data-science]
             </div>
         </div>
         <div class="text_cell_render rendered_html" tabs="-1">
-            <h2 id="Infering-Vectors">Infering Vectors<a class="anchor-link" href="#Infering-Vectors">¶</a></h2>
+            <h2 id="Inferring-Vectors">Inferring Vectors<a class="anchor-link" href="#Inferring-Vectors">¶</a></h2>
         </div>
     </div>
 </div>
