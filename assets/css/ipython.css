@@ -1329,7 +1329,7 @@ code,
 kbd,
 pre,
 samp {
-  /*font-family: monospace;*/
+  font-family: monospace;
 }
 code {
   padding: 2px 4px;
@@ -9324,12 +9324,12 @@ div.cell.selected.jupyter-soft-selected {
 }
 .prompt {
   /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
-  /*min-width: 14ex;*/
+  min-width: 14ex;
   /* This padding is tuned to match the padding on the CodeMirror editor. */
   /*padding: 0.4em;*/
   margin-right: 5px;
   width: 7%;
-  /*font-family: monospace;*/
+  font-family: monospace;
   text-align: right;
   /* This has to match that of the the CodeMirror class line-height below */
   line-height: 1.21429em;
@@ -11762,4 +11762,15 @@ div#notebook {
 
 pre {
 	overflow-x: inherit !important;
+}
+
+.page{
+	float: none;
+}
+.page__title{
+    margin-left: 17% !important;
+}
+.page__meta{
+	margin-left: 17% !important;
+    padding-top: 6px;
 }
