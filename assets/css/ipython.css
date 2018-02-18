@@ -8711,8 +8711,8 @@ span#login_widget > .button .badge,
 }
 @media (min-width: 768px) {
   select.form-control {
-    margin-left: 12px;
-    margin-right: 12px;
+    /*margin-left: 12px;
+    margin-right: 12px;*/
   }
 }
 /*!
@@ -11767,10 +11767,11 @@ pre {
 .page{
 	float: none;
 }
-.page__title{
-    margin-left: 17% !important;
-}
-.page__meta{
+
+header{
 	margin-left: 17% !important;
     padding-top: 6px;
+}
+.page__related{
+	margin-left: 4.186440678%;
 }
