@@ -789,6 +789,11 @@ HIP HOP_support: 20640
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 243.594px; left: 590.531px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 266px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">I've also created a dashboard that you can play around with. It visualizes what we just did with our dataframes. Namely, you can look up which songs are most likely to belong to a different genre. In the upper left quadrant, you have the top 1,000 hip hop songs that have alt rock lyrics; you can also choose which genre you'd like to analyze with the drop down options. In the upper right quandrant, there's a table of the top 100 songs based on the filter of the upper left quadrant. In the lower left quadrant, you can see the lyrics weighted by tf-idf scores to allow you to visualize which words are hip hop, alt rock, and country. Lastly, in the lower right quadrant, you have a scatter plot with the tf-idf scores for each word for each genre. This graph is another way of visualizing the lower left quadrant. </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">With these graphs, you'll get more insight into why exactly the model classified a song a certain way.</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-tag cm-bracket"></span><span class="cm-tag">b</span><span class="cm-tag cm-bracket"></span>To get started, first select a song from the upper left scatter plot.<span class="cm-tag cm-bracket">/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket"></span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 296px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>I've also created a dashboard that you can play around with. It visualizes what we just did with our dataframes. Namely, you can look up which songs are most likely to belong to a different genre. In the upper left quadrant, you have the top 1,000 hip hop songs that have alt rock lyrics; you can also choose which genre you'd like to analyze with the drop down options. In the upper right quandrant, there's a table of the top 100 songs based on the filter of the upper left quadrant. In the lower left quadrant, you can see the lyrics weighted by tf-idf scores to allow you to visualize which words are hip hop, alt rock, and country. Lastly, in the lower right quadrant, you have a scatter plot with the tf-idf scores for each word for each genre. This graph is another way of visualizing the lower left quadrant. </p>
 <p>With these graphs, you'll get more insight into why exactly the model classified a song a certain way.</p>
 <p><b>To get started, first select a song from the upper left scatter plot.</b> (Dashboard is best viewed on non-mobile device.)</p>
+<p>Try these songs to get you started: <br/>
+	Immortal Technique's <button class="btn btn-xs mb-2" style="background-color:#3182bd;" id="ultimasPalabras">Ultimas Palabras</button>, which is a rap song that has lots of alt rock lyrics.<br/>
+	Joan Jett and the Blackhearts's <button class="btn btn-xs mb-2" style="background-color:#31a354;" id="newOrleans">New Orleans</button>, an alt rock song with country lyrics.<br/>
+	Deftones' <button class="btn btn-xs mb-2" style="background-color:#31a354;" id="blackMoon">Black Moon</button>, an alt rock song with hip hop lyrics.
+</p>
 </div></div></div>
 
 <svg height="20" width="20">
@@ -1102,6 +1107,24 @@ $(document).ready(function(){
 				changeScatterOne('Country', 'Hip_Hop');
 				var thugStory = data.filter(function(d){return d.song == 'Thug Story' && d.artist == 'Taylor Swift'})[0];
 				drillDown(thugStory, 'Hip_Hop', 'Country', '#scatterLeft')
+			});
+
+			$('#ultimasPalabras').on('click', function(e){
+				changeScatterOne('Hip_Hop', 'Alt_Rock');
+				var ultimasPalabras = data.filter(function(d){return d.song == 'Ultimas Palabras' && d.artist == 'Immortal_Technique'})[0];
+				drillDown(ultimasPalabras, 'Alt_Rock', 'Hip_Hop', '#scatterLeft')
+			});
+
+			$('#newOrleans').on('click', function(e){
+				changeScatterOne('Alt_Rock', 'Country');
+				var newOrleans = data.filter(function(d){return d.song == 'New Orleans' && d.artist == 'Joan Jett and the Blackhearts'})[0];
+				drillDown(newOrleans, 'Country', 'Alt_Rock', '#scatterLeft')
+			});
+
+			$('#blackMoon').on('click', function(e){
+				changeScatterOne('Alt_Rock', 'Hip_Hop');
+				var blackMoon = data.filter(function(d){return d.song == 'Black Moon' && d.artist == 'Deftones'})[0];
+				drillDown(blackMoon, 'Hip_Hop', 'Alt_Rock', '#scatterLeft')
 			});
 
 			drawScatter(data, 'Alt_Rock', 'Hip_Hop', '#scatterLeft');
