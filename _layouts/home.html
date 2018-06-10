@@ -2,6 +2,21 @@
 layout: archive
 ---
 
+<style>
+.list__item {
+    padding-right: 100px;
+}
+
+@media (min-width: 64em)
+.list__item {
+    padding-right: 100px;
+}
+@media (min-width: 48em)
+.list__item {
+    padding-right: 50px;
+}
+</style>
+
 <h3 class="archive__subtitle">{{ site.data.ui-text[site.locale].recent_posts | default: "Recent Posts" }}</h3>
 
 {% for post in paginator.posts %}
