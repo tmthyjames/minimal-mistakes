@@ -8,10 +8,10 @@
 # Site Settings
 theme					 : minimal-mistakes-jekyll
 locale                   : "en"
-title                    : "tmthyjames"
+title                    : "Grid Searched"
 title_separator          : "|"
 name                     : "Timothy James Dobbins"
-description              : "A data science blog."
+description              : "A machine learning blog."
 url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -80,8 +80,8 @@ analytics:
 author:
   name             : "Timothy James Dobbins"
   avatar           : https://avatars0.githubusercontent.com/u/8451865
-  bio              : "data scientist | software engineer"
-  location         : "nashville, tn"
+  bio              : "Machine learning engineer"
+  location         : "Nashville, TN"
   email            :
   uri              :
   bitbucket        :
