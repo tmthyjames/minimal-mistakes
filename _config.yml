@@ -8,7 +8,7 @@
 # Site Settings
 theme					 : minimal-mistakes-jekyll
 locale                   : "en"
-title                    : "Grid Searched"
+title                    : "Grid-Searched"
 title_separator          : "|"
 name                     : "Timothy James Dobbins"
 description              : "A machine learning blog."
