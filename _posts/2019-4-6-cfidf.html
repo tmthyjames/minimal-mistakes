@@ -9,38 +9,797 @@ tags: [data-science, nlp, eda, word-embeddings]
 <link rel="stylesheet" type="text/css" href="/assets/css/ipython.css">
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 <style>
-div.output_area{ max-height:500px; } 
-.button-sect{ margin:2px; } 
-.rendered_html * + p { margin-top: 0.23em !important; } 
-div.text_cell{ flex-direction: row !important; } 
-.prompt { min-width: 0ex; width: 1%;} 
-</style><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 35px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-1"># Intro</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 65px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h1 id="Intro">Intro<a class="anchor-link" href="#Intro">¶</a></h1>
-</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 120.142px; left: 536.506px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 240px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>C<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>oncept <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>F<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>requency-<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>I<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>nverse Concept <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>D<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>ocument <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>F<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>requency (or CFIDF) is a measure I've created to explore and visualize text data and it works surprisingly well. As opposed to its statistical parent TF-IDF, it isn't based strictly on word counts, but on <span class="cm-em">*entire concepts*</span>, assuming that you're word embedding layer is trained appropriately. First, it may help to explain what TF-IDF accomplishes. </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Most of NLP is trying to figure out what a body of text is about. TF-IDF is crucial to answering this question as it calculates how unique a word is to a document compared to other documents in the corpus. If you can measure how important a set of words is to a document, then you're one step closer to answering what the document is about. One problem here is the issue of synonyms, commonly misspelled words, and even conceptually similar words or phrases. These issues tend to dilute the impact a word has on a document. This is where CFIDF comes in. </span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 270px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p><b>C</b>oncept <b>F</b>requency-<b>I</b>nverse Concept <b>D</b>ocument <b>F</b>requency (or CFIDF) is a measure I've created to explore and visualize text data and it works surprisingly well. As opposed to its statistical parent TF-IDF, it isn't based strictly on word counts, but on <em>entire concepts</em>, assuming that you're word embedding layer is trained appropriately. First, it may help to explain what TF-IDF accomplishes. </p>
+div.output_area{max-height:400px;}
+.button-sect{margin:2px;}
+</style>
+<div class="cell text_cell rendered " tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59659px; left: 136.435px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 125px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre>x</pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable-2">* </span><span class="cm-link cm-variable-2">[Intro]</span><span class="cm-string cm-url cm-variable-2">(#Intro)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable-2">* </span><span class="cm-link cm-variable-2">[Word Embeddings and Semantic Similarity]</span><span class="cm-string cm-url cm-variable-2">(#Word-Embeddings-and-Semantic-Similarity)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable-2">* </span><span class="cm-link cm-variable-2">[Calculating CFIDF]</span><span class="cm-string cm-url cm-variable-2">(#Calculating-CFIDF)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable-2">* </span><span class="cm-link cm-variable-2">[Visualizing CFIDF]</span><span class="cm-string cm-url cm-variable-2">(#Visualizing-CFIDF)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable-2">* </span><span class="cm-link cm-variable-2">[What it's not]</span><span class="cm-string cm-url cm-variable-2">(#What-it's-not)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable-2">* </span><span class="cm-link cm-variable-2">[What's Next]</span><span class="cm-string cm-url cm-variable-2">(#What's-Next)</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 155px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><ul>
+<li><a href="#Intro">Intro</a></li>
+<li><a href="#Word-Embeddings-and-Semantic-Similarity">Word Embeddings and Semantic Similarity</a></li>
+<li><a href="#Calculating-CFIDF">Calculating CFIDF</a></li>
+<li><a href="#Visualizing-CFIDF">Visualizing CFIDF</a></li>
+<li><a href="#What-it's-not">What it's not</a></li>
+<li><a href="#What's-Next">What's Next</a></li>
+</ul>
+</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 35px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-1"># Intro</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 65px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h1 id="Intro">Intro<a class="anchor-link" href="#Intro">¶</a></h1>
+</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 120.142px; left: 536.506px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 240px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>C<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>oncept <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>F<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>requency-<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>I<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>nverse Concept <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>D<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>ocument <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>F<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">b</span><span class="cm-tag cm-bracket">&gt;</span>requency (or CFIDF) is a measure I've created to explore text data and it works surprisingly well for exploring and visualizing text data. As opposed to its statistical parent TF-IDF, it isn't based strictly on word counts, but on <span class="cm-em">*entire concepts*</span>, assuming that you're word embedding layer is trained appropriately. First, it may help to explain what TF-IDF accomplishes. </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Most of NLP is trying to figure out what a body of text is about. TF-IDF is crucial to answering this question as it calculates how unique a word is to a document compared to other documents in the corpus. If you can measure how important a set of words is to a document, then you're one step closer to answering what the document is about. One problem here is the issue of synonyms, commonly misspelled words, and even conceptually similar words or phrases. These issues tend to dilute the impact a word has on a document. This is where CFIDF comes in. </span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 270px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p><b>C</b>oncept <b>F</b>requency-<b>I</b>nverse Concept <b>D</b>ocument <b>F</b>requency (or CFIDF) is a measure I've created to explore text data and it works surprisingly well for exploring and visualizing text data. As opposed to its statistical parent TF-IDF, it isn't based strictly on word counts, but on <em>entire concepts</em>, assuming that you're word embedding layer is trained appropriately. First, it may help to explain what TF-IDF accomplishes. </p>
 <p>Most of NLP is trying to figure out what a body of text is about. TF-IDF is crucial to answering this question as it calculates how unique a word is to a document compared to other documents in the corpus. If you can measure how important a set of words is to a document, then you're one step closer to answering what the document is about. One problem here is the issue of synonyms, commonly misspelled words, and even conceptually similar words or phrases. These issues tend to dilute the impact a word has on a document. This is where CFIDF comes in. </p>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59659px; left: 552.869px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 35px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-1"># Word Embeddings and Semantic Similarity</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 65px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h1 id="Word-Embeddings-and-Semantic-Similarity">Word Embeddings and Semantic Similarity<a class="anchor-link" href="#Word-Embeddings-and-Semantic-Similarity">¶</a></h1>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 21.5057px; left: 113.778px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 125px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Word2Vec, which is the word embedding algorithm I use here (but you can use any word embedding algorithm), produces measures of semantic similarity. This allows us to determine if two words are semantically similar (or conceptually similar), regardless if they are synonyms, commonly misspelled words, or different parts of speech entirely. Thus, with CFIDF, we can calculate how <span class="cm-em">*frequent a concept*</span> shows up in a document compared to how frequent it shows up in other documents in a corpus. </span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 155px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>Word2Vec, which is the word embedding algorithm I use here (but you can use any word embedding algorithm), produces measures of semantic similarity. This allows us to determine if two words are semantically similar (or conceptually similar), regardless if they are synonyms, commonly misspelled words, or different parts of speech entirely. Thus, with CFIDF, we can calculate how <em>frequent a concept</em> shows up in a document compared to how frequent it shows up in other documents in a corpus. </p>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 35px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-1"># Calculating CFIDF</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 65px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h1 id="Calculating-CFIDF">Calculating CFIDF<a class="anchor-link" href="#Calculating-CFIDF">¶</a></h1>
-</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 86.9602px; left: 490.142px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 109px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Calculating CFIDF is pretty straight forward and almost exactly like TF-IDF but instead of using term frequency you'd use <span class="cm-em">*concept frequency*</span>. To do this, you establish a user-defined similarity threshold on your similarity queries to your word embeddings. If a word in the document is above this threshold then we count that as being conceptually similar and thus increasing concept frequency (it may help to set thresholds on each concept/target word individually). </span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 139px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>Calculating CFIDF is pretty straight forward and almost exactly like TF-IDF but instead of using term frequency you'd use <em>concept frequency</em>. To do this, you establish a user-defined similarity threshold on your similarity queries to your word embeddings. If a word in the document is above this threshold then we count that as being conceptually similar and thus increasing concept frequency (it may help to set thresholds on each concept/target word individually). </p>
+</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 21.5057px; left: 274.687px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 109px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Calculating CFIDF is pretty straight forward and almost exactly like TF-IDF but instead of using term frequency you use <span class="cm-em">*concept frequency*</span>. To do this, you establish a user-defined similarity threshold on your similarity queries to your word embeddings. If a word in the document is above this threshold then we count that as being conceptually similar and thus increasing concept frequency (it may help to set thresholds on each concept/target word individually). </span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 139px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>Calculating CFIDF is pretty straight forward and almost exactly like TF-IDF but instead of using term frequency you use <em>concept frequency</em>. To do this, you establish a user-defined similarity threshold on your similarity queries to your word embeddings. If a word in the document is above this threshold then we count that as being conceptually similar and thus increasing concept frequency (it may help to set thresholds on each concept/target word individually). </p>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 54.233px; left: 221.051px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 76px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">One may notice that I'm computing concept frequency by dividing the number of times a concept appears by the total number of <span class="cm-em">*terms*</span> in the document. Since we can't easily detect the number of concepts present this will have to do as a way to account for document length.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 106px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>One may notice that I'm computing concept frequency by dividing the number of times a concept appears by the total number of <em>terms</em> in the document. Since we can't easily detect the number of concepts present this will have to do as a way to account for document length.</p>
-</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59659px; left: 5.59658px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 60px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">cf(c,d) = {\displaystyle f<span class="cm-em">_{c,d}{\Bigg /}{\sum _</span>{t'\in d}{f<span class="cm-em">_{t',d}}}}</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"> <span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 90px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p><span class="MathJax_Preview" style="color: inherit;"></span><script type="math/tex; mode=display" id="MathJax-Element-20">
+</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59659px; left: 5.59658px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 60px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">cf(c,d) = {\displaystyle f<span class="cm-em">_{c,d}{\Bigg /}{\sum _</span>{t'\in d}{f<span class="cm-em">_{t',d}}}}</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"> <span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 90px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p><span class="MathJax_Preview" style="color: inherit;"></span><div class="MathJax_Display" style="text-align: center;"><span class="MathJax" id="MathJax-Element-20-Frame" tabs="0" style="position: relative;" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;block&quot;><mi>c</mi><mi>f</mi><mo stretchy=&quot;false&quot;>(</mo><mi>c</mi><mo>,</mo><mi>d</mi><mo stretchy=&quot;false&quot;>)</mo><mo>=</mo><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mstyle displaystyle=&quot;true&quot; scriptlevel=&quot;0&quot;><msub><mi>f</mi><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mi>c</mi><mo>,</mo><mi>d</mi></mrow></msub><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mo fence=&quot;true&quot; stretchy=&quot;true&quot; symmetric=&quot;true&quot; maxsize=&quot;2.470em&quot; minsize=&quot;2.470em&quot;>/</mo></mrow></mrow><mrow class=&quot;MJX-TeXAtom-ORD&quot;><munder><mo>&amp;#x2211;</mo><mrow class=&quot;MJX-TeXAtom-ORD&quot;><msup><mi>t</mi><mo>&amp;#x2032;</mo></msup><mo>&amp;#x2208;</mo><mi>d</mi></mrow></munder><mrow class=&quot;MJX-TeXAtom-ORD&quot;><msub><mi>f</mi><mrow class=&quot;MJX-TeXAtom-ORD&quot;><msup><mi>t</mi><mo>&amp;#x2032;</mo></msup><mo>,</mo><mi>d</mi></mrow></msub></mrow></mrow></mstyle></mrow></math>" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-476" role="math" style="width: 9.919em; display: inline-block;"><span style="display: inline-block; position: relative; width: 9.498em; height: 0px; font-size: 104%;"><span style="position: absolute; clip: rect(2.166em, 1009.5em, 5.652em, -999.997em); top: -4.144em; left: 0.003em;"><span class="mrow" id="MathJax-Span-477"><span class="mi" id="MathJax-Span-478" style="font-family: STIXMathJax_Main-italic;">c</span><span class="mi" id="MathJax-Span-479" style="font-family: STIXMathJax_Main-italic;">f<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.123em;"></span></span><span class="mo" id="MathJax-Span-480" style="font-family: STIXMathJax_Main;">(</span><span class="mi" id="MathJax-Span-481" style="font-family: STIXMathJax_Main-italic;">c</span><span class="mo" id="MathJax-Span-482" style="font-family: STIXMathJax_Main;">,</span><span class="mi" id="MathJax-Span-483" style="font-family: STIXMathJax_Main-italic; padding-left: 0.183em;">d<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span><span class="mo" id="MathJax-Span-484" style="font-family: STIXMathJax_Main;">)</span><span class="mo" id="MathJax-Span-485" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">=</span><span class="texatom" id="MathJax-Span-486" style="padding-left: 0.303em;"><span class="mrow" id="MathJax-Span-487"><span class="mstyle" id="MathJax-Span-488"><span class="mrow" id="MathJax-Span-489"><span class="msubsup" id="MathJax-Span-490"><span style="display: inline-block; position: relative; width: 1.205em; height: 0px;"><span style="position: absolute; clip: rect(3.188em, 1000.42em, 4.39em, -999.997em); top: -4.023em; left: 0.003em;"><span class="mi" id="MathJax-Span-491" style="font-family: STIXMathJax_Main-italic;">f<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.123em;"></span></span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span><span style="position: absolute; top: -3.903em; left: 0.303em;"><span class="texatom" id="MathJax-Span-492"><span class="mrow" id="MathJax-Span-493"><span class="mi" id="MathJax-Span-494" style="font-size: 70.7%; font-family: STIXMathJax_Main-italic;">c</span><span class="mo" id="MathJax-Span-495" style="font-size: 70.7%; font-family: STIXMathJax_Main;">,</span><span class="mi" id="MathJax-Span-496" style="font-size: 70.7%; font-family: STIXMathJax_Main-italic;">d<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span></span></span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span></span></span><span class="texatom" id="MathJax-Span-497" style=""><span class="mrow" id="MathJax-Span-498"><span class="texatom" id="MathJax-Span-499" style=""><span class="mrow" id="MathJax-Span-500"><span class="mo" id="MathJax-Span-501" style="vertical-align: -0.778em;"><span style="font-family: STIXMathJax_Size4;">/</span></span></span></span></span></span><span class="texatom" id="MathJax-Span-502"><span class="mrow" id="MathJax-Span-503"><span class="munderover" id="MathJax-Span-504"><span style="display: inline-block; position: relative; width: 1.325em; height: 0px;"><span style="position: absolute; clip: rect(2.888em, 1001.21em, 4.691em, -999.997em); top: -4.023em; left: 0.003em;"><span class="mo" id="MathJax-Span-505" style="font-family: STIXMathJax_Size1; vertical-align: -0.538em;">∑</span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span><span style="position: absolute; clip: rect(3.308em, 1001.33em, 4.33em, -999.997em); top: -2.822em; left: 0.003em;"><span class="texatom" id="MathJax-Span-506"><span class="mrow" id="MathJax-Span-507"><span class="msup" id="MathJax-Span-508"><span style="display: inline-block; position: relative; width: 0.484em; height: 0px;"><span style="position: absolute; clip: rect(3.489em, 1000.18em, 4.21em, -999.997em); top: -4.023em; left: 0.003em;"><span class="mi" id="MathJax-Span-509" style="font-size: 70.7%; font-family: STIXMathJax_Main-italic;">t<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span><span style="position: absolute; top: -4.264em; left: 0.243em;"><span class="mo" id="MathJax-Span-510" style="font-size: 50%; font-family: STIXMathJax_Variants;">′</span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span></span></span><span class="mo" id="MathJax-Span-511" style="font-size: 70.7%; font-family: STIXMathJax_Main;">∈</span><span class="mi" id="MathJax-Span-512" style="font-size: 70.7%; font-family: STIXMathJax_Main-italic;">d<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span></span></span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span></span></span><span class="texatom" id="MathJax-Span-513" style="padding-left: 0.183em;"><span class="mrow" id="MathJax-Span-514"><span class="msubsup" id="MathJax-Span-515"><span style="display: inline-block; position: relative; width: 1.385em; height: 0px;"><span style="position: absolute; clip: rect(3.188em, 1000.42em, 4.39em, -999.997em); top: -4.023em; left: 0.003em;"><span class="mi" id="MathJax-Span-516" style="font-family: STIXMathJax_Main-italic;">f<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.123em;"></span></span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span><span style="position: absolute; top: -3.903em; left: 0.303em;"><span class="texatom" id="MathJax-Span-517"><span class="mrow" id="MathJax-Span-518"><span class="msup" id="MathJax-Span-519"><span style="display: inline-block; position: relative; width: 0.484em; height: 0px;"><span style="position: absolute; clip: rect(3.489em, 1000.18em, 4.21em, -999.997em); top: -4.023em; left: 0.003em;"><span class="mi" id="MathJax-Span-520" style="font-size: 70.7%; font-family: STIXMathJax_Main-italic;">t<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span><span style="position: absolute; top: -4.204em; left: 0.243em;"><span class="mo" id="MathJax-Span-521" style="font-size: 50%; font-family: STIXMathJax_Variants;">′</span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span></span></span><span class="mo" id="MathJax-Span-522" style="font-size: 70.7%; font-family: STIXMathJax_Main;">,</span><span class="mi" id="MathJax-Span-523" style="font-size: 70.7%; font-family: STIXMathJax_Main-italic;">d<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span></span></span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span></span></span></span></span></span></span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 4.15em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -1.434em; border-left: 0px solid; width: 0px; height: 3.378em;"></span></span></nobr><span class="MJX_Assistive_MathML MJX_Assistive_MathML_Block" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>c</mi><mi>f</mi><mo stretchy="false">(</mo><mi>c</mi><mo>,</mo><mi>d</mi><mo stretchy="false">)</mo><mo>=</mo><mrow class="MJX-TeXAtom-ORD"><mstyle displaystyle="true" scriptlevel="0"><msub><mi>f</mi><mrow class="MJX-TeXAtom-ORD"><mi>c</mi><mo>,</mo><mi>d</mi></mrow></msub><mrow class="MJX-TeXAtom-ORD"><mrow class="MJX-TeXAtom-ORD"><mo fence="true" stretchy="true" symmetric="true" maxsize="2.470em" minsize="2.470em">/</mo></mrow></mrow><mrow class="MJX-TeXAtom-ORD"><munder><mo>∑</mo><mrow class="MJX-TeXAtom-ORD"><msup><mi>t</mi><mo>′</mo></msup><mo>∈</mo><mi>d</mi></mrow></munder><mrow class="MJX-TeXAtom-ORD"><msub><mi>f</mi><mrow class="MJX-TeXAtom-ORD"><msup><mi>t</mi><mo>′</mo></msup><mo>,</mo><mi>d</mi></mrow></msub></mrow></mrow></mstyle></mrow></math></span></span></div><script type="math/tex; mode=display" id="MathJax-Element-20">
 cf(c,d) = {\displaystyle f_{c,d}{\Bigg /}{\sum _{t'\in d}{f_{t',d}}}}
  </script></p>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59659px; left: 605.597px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 93px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style=""></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">I calculate inverse concept document frequency by using the following formula:</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"> \mathrm{idf}(c, D) =  \log \frac{N}{1+|\{d \in D: c \in d\}|}</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 123px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>I calculate inverse concept document frequency by using the following formula:</p>
-<p><span class="MathJax_Preview" style="color: inherit;"></span><script type="math/tex; mode=display" id="MathJax-Element-21">
+<p><span class="MathJax_Preview" style="color: inherit;"></span><div class="MathJax_Display" style="text-align: center;"><span class="MathJax" id="MathJax-Element-21-Frame" tabs="0" style="position: relative;" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;block&quot;><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mi mathvariant=&quot;normal&quot;>i</mi><mi mathvariant=&quot;normal&quot;>d</mi><mi mathvariant=&quot;normal&quot;>f</mi></mrow><mo stretchy=&quot;false&quot;>(</mo><mi>c</mi><mo>,</mo><mi>D</mi><mo stretchy=&quot;false&quot;>)</mo><mo>=</mo><mi>log</mi><mo>&amp;#x2061;</mo><mfrac><mi>N</mi><mrow><mn>1</mn><mo>+</mo><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mo stretchy=&quot;false&quot;>|</mo></mrow><mo fence=&quot;false&quot; stretchy=&quot;false&quot;>{</mo><mi>d</mi><mo>&amp;#x2208;</mo><mi>D</mi><mo>:</mo><mi>c</mi><mo>&amp;#x2208;</mo><mi>d</mi><mo fence=&quot;false&quot; stretchy=&quot;false&quot;>}</mo><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mo stretchy=&quot;false&quot;>|</mo></mrow></mrow></mfrac></math>" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-524" role="math" style="width: 15.808em; display: inline-block;"><span style="display: inline-block; position: relative; width: 15.207em; height: 0px; font-size: 104%;"><span style="position: absolute; clip: rect(1.025em, 1015.21em, 3.549em, -999.997em); top: -2.521em; left: 0.003em;"><span class="mrow" id="MathJax-Span-525"><span class="texatom" id="MathJax-Span-526"><span class="mrow" id="MathJax-Span-527"><span class="mi" id="MathJax-Span-528" style="font-family: STIXMathJax_Main;">i</span><span class="mi" id="MathJax-Span-529" style="font-family: STIXMathJax_Main;">d</span><span class="mi" id="MathJax-Span-530" style="font-family: STIXMathJax_Main;">f<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.063em;"></span></span></span></span><span class="mo" id="MathJax-Span-531" style="font-family: STIXMathJax_Main;">(</span><span class="mi" id="MathJax-Span-532" style="font-family: STIXMathJax_Main-italic;">c</span><span class="mo" id="MathJax-Span-533" style="font-family: STIXMathJax_Main;">,</span><span class="mi" id="MathJax-Span-534" style="font-family: STIXMathJax_Main-italic; padding-left: 0.183em;">D</span><span class="mo" id="MathJax-Span-535" style="font-family: STIXMathJax_Main;">)</span><span class="mo" id="MathJax-Span-536" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">=</span><span class="mi" id="MathJax-Span-537" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">log</span><span class="mo" id="MathJax-Span-538"></span><span class="mfrac" id="MathJax-Span-539" style="padding-left: 0.183em;"><span style="display: inline-block; position: relative; width: 8.837em; height: 0px; margin-right: 0.123em; margin-left: 0.123em;"><span style="position: absolute; clip: rect(3.188em, 1000.72em, 4.21em, -999.997em); top: -4.684em; left: 50%; margin-left: -0.358em;"><span class="mi" id="MathJax-Span-540" style="font-family: STIXMathJax_Main-italic;">N<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.063em;"></span></span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span><span style="position: absolute; clip: rect(3.188em, 1008.66em, 4.39em, -999.997em); top: -3.362em; left: 50%; margin-left: -4.384em;"><span class="mrow" id="MathJax-Span-541"><span class="mn" id="MathJax-Span-542" style="font-family: STIXMathJax_Main;">1</span><span class="mo" id="MathJax-Span-543" style="font-family: STIXMathJax_Main; padding-left: 0.243em;">+</span><span class="texatom" id="MathJax-Span-544" style="padding-left: 0.243em;"><span class="mrow" id="MathJax-Span-545"><span class="mo" id="MathJax-Span-546" style="font-family: STIXMathJax_Main;">|</span></span></span><span class="mo" id="MathJax-Span-547" style="font-family: STIXMathJax_Main;">{</span><span class="mi" id="MathJax-Span-548" style="font-family: STIXMathJax_Main-italic;">d<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span><span class="mo" id="MathJax-Span-549" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">∈</span><span class="mi" id="MathJax-Span-550" style="font-family: STIXMathJax_Main-italic; padding-left: 0.303em;">D</span><span class="mo" id="MathJax-Span-551" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">:</span><span class="mi" id="MathJax-Span-552" style="font-family: STIXMathJax_Main-italic; padding-left: 0.303em;">c</span><span class="mo" id="MathJax-Span-553" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">∈</span><span class="mi" id="MathJax-Span-554" style="font-family: STIXMathJax_Main-italic; padding-left: 0.303em;">d<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span><span class="mo" id="MathJax-Span-555" style="font-family: STIXMathJax_Main;">}</span><span class="texatom" id="MathJax-Span-556"><span class="mrow" id="MathJax-Span-557"><span class="mo" id="MathJax-Span-558" style="font-family: STIXMathJax_Main;">|</span></span></span></span><span style="display: inline-block; width: 0px; height: 4.029em;"></span></span><span style="position: absolute; clip: rect(0.844em, 1008.84em, 1.265em, -999.997em); top: -1.319em; left: 0.003em;"><span style="display: inline-block; overflow: hidden; vertical-align: 0.003em; border-top: 1.3px solid; width: 8.837em; height: 0px;"></span><span style="display: inline-block; width: 0px; height: 1.085em;"></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.527em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.934em; border-left: 0px solid; width: 0px; height: 2.441em;"></span></span></nobr><span class="MJX_Assistive_MathML MJX_Assistive_MathML_Block" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow class="MJX-TeXAtom-ORD"><mi mathvariant="normal">i</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">f</mi></mrow><mo stretchy="false">(</mo><mi>c</mi><mo>,</mo><mi>D</mi><mo stretchy="false">)</mo><mo>=</mo><mi>log</mi><mo>⁡</mo><mfrac><mi>N</mi><mrow><mn>1</mn><mo>+</mo><mrow class="MJX-TeXAtom-ORD"><mo stretchy="false">|</mo></mrow><mo fence="false" stretchy="false">{</mo><mi>d</mi><mo>∈</mo><mi>D</mi><mo>:</mo><mi>c</mi><mo>∈</mo><mi>d</mi><mo fence="false" stretchy="false">}</mo><mrow class="MJX-TeXAtom-ORD"><mo stretchy="false">|</mo></mrow></mrow></mfrac></math></span></span></div><script type="math/tex; mode=display" id="MathJax-Element-21">
  \mathrm{idf}(c, D) =  \log \frac{N}{1+|\{d \in D: c \in d\}|}
 </script></p>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 38.3239px; left: 5.59658px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 125px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style=""></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">With </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">N being the total number of documents in the corpus or <span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span> N = {|D|} <span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">The denominator:</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span>1+|\{d \in D: c \in d\}|<span class="cm-delimit cm-delimit-open">$</span><span class="cm-delimit cm-delimit-close">$</span><span class="cm-trailing-space-a"> </span><span class="cm-trailing-space-new-line">&nbsp;</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">is the number of documents where the concept c appears, and I add the constant 1 to avoid division by zero.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 155px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>With 
-N being the total number of documents in the corpus or <span class="MathJax_Preview" style="color: inherit;"></span><script type="math/tex; mode=display" id="MathJax-Element-17"> N = {|D|} </script>
+N being the total number of documents in the corpus or <span class="MathJax_Preview" style="color: inherit;"></span><div class="MathJax_Display" style="text-align: center;"><span class="MathJax" id="MathJax-Element-17-Frame" tabs="0" style="position: relative;" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;block&quot;><mi>N</mi><mo>=</mo><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mo stretchy=&quot;false&quot;>|</mo></mrow><mi>D</mi><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mo stretchy=&quot;false&quot;>|</mo></mrow></mrow></math>" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-409" role="math" style="width: 3.188em; display: inline-block;"><span style="display: inline-block; position: relative; width: 3.068em; height: 0px; font-size: 104%;"><span style="position: absolute; clip: rect(1.686em, 1003.01em, 2.707em, -999.997em); top: -2.521em; left: 0.003em;"><span class="mrow" id="MathJax-Span-410"><span class="mi" id="MathJax-Span-411" style="font-family: STIXMathJax_Main-italic;">N<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.063em;"></span></span><span class="mo" id="MathJax-Span-412" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">=</span><span class="texatom" id="MathJax-Span-413" style="padding-left: 0.303em;"><span class="mrow" id="MathJax-Span-414"><span class="texatom" id="MathJax-Span-415"><span class="mrow" id="MathJax-Span-416"><span class="mo" id="MathJax-Span-417" style="font-family: STIXMathJax_Main;">|</span></span></span><span class="mi" id="MathJax-Span-418" style="font-family: STIXMathJax_Main-italic;">D</span><span class="texatom" id="MathJax-Span-419"><span class="mrow" id="MathJax-Span-420"><span class="mo" id="MathJax-Span-421" style="font-family: STIXMathJax_Main;">|</span></span></span></span></span></span><span style="display: inline-block; width: 0px; height: 2.527em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.059em; border-left: 0px solid; width: 0px; height: 0.816em;"></span></span></nobr><span class="MJX_Assistive_MathML MJX_Assistive_MathML_Block" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>N</mi><mo>=</mo><mrow class="MJX-TeXAtom-ORD"><mrow class="MJX-TeXAtom-ORD"><mo stretchy="false">|</mo></mrow><mi>D</mi><mrow class="MJX-TeXAtom-ORD"><mo stretchy="false">|</mo></mrow></mrow></math></span></span></div><script type="math/tex; mode=display" id="MathJax-Element-17"> N = {|D|} </script>
 The denominator:
-<span class="MathJax_Preview" style="color: inherit;"></span><script type="math/tex; mode=display" id="MathJax-Element-18">1+|\{d \in D: c \in d\}|</script>  </p>
+<span class="MathJax_Preview" style="color: inherit;"></span><div class="MathJax_Display" style="text-align: center;"><span class="MathJax" id="MathJax-Element-18-Frame" tabs="0" style="position: relative;" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;block&quot;><mn>1</mn><mo>+</mo><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mo stretchy=&quot;false&quot;>|</mo></mrow><mo fence=&quot;false&quot; stretchy=&quot;false&quot;>{</mo><mi>d</mi><mo>&amp;#x2208;</mo><mi>D</mi><mo>:</mo><mi>c</mi><mo>&amp;#x2208;</mo><mi>d</mi><mo fence=&quot;false&quot; stretchy=&quot;false&quot;>}</mo><mrow class=&quot;MJX-TeXAtom-ORD&quot;><mo stretchy=&quot;false&quot;>|</mo></mrow></math>" role="presentation"><nobr aria-hidden="true"><span class="math" id="MathJax-Span-422" role="math" style="width: 8.777em; display: inline-block;"><span style="display: inline-block; position: relative; width: 8.416em; height: 0px; font-size: 104%;"><span style="position: absolute; clip: rect(1.686em, 1008.36em, 2.888em, -999.997em); top: -2.521em; left: 0.003em;"><span class="mrow" id="MathJax-Span-423"><span class="mn" id="MathJax-Span-424" style="font-family: STIXMathJax_Main;">1</span><span class="mo" id="MathJax-Span-425" style="font-family: STIXMathJax_Main; padding-left: 0.243em;">+</span><span class="texatom" id="MathJax-Span-426" style="padding-left: 0.243em;"><span class="mrow" id="MathJax-Span-427"><span class="mo" id="MathJax-Span-428" style="font-family: STIXMathJax_Main;">|</span></span></span><span class="mo" id="MathJax-Span-429" style="font-family: STIXMathJax_Main;">{</span><span class="mi" id="MathJax-Span-430" style="font-family: STIXMathJax_Main-italic;">d<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span><span class="mo" id="MathJax-Span-431" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">∈</span><span class="mi" id="MathJax-Span-432" style="font-family: STIXMathJax_Main-italic; padding-left: 0.303em;">D</span><span class="mo" id="MathJax-Span-433" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">:</span><span class="mi" id="MathJax-Span-434" style="font-family: STIXMathJax_Main-italic; padding-left: 0.303em;">c</span><span class="mo" id="MathJax-Span-435" style="font-family: STIXMathJax_Main; padding-left: 0.303em;">∈</span><span class="mi" id="MathJax-Span-436" style="font-family: STIXMathJax_Main-italic; padding-left: 0.303em;">d<span style="display: inline-block; overflow: hidden; height: 1px; width: 0.003em;"></span></span><span class="mo" id="MathJax-Span-437" style="font-family: STIXMathJax_Main;">}</span><span class="texatom" id="MathJax-Span-438"><span class="mrow" id="MathJax-Span-439"><span class="mo" id="MathJax-Span-440" style="font-family: STIXMathJax_Main;">|</span></span></span></span><span style="display: inline-block; width: 0px; height: 2.527em;"></span></span></span><span style="display: inline-block; overflow: hidden; vertical-align: -0.247em; border-left: 0px solid; width: 0px; height: 1.003em;"></span></span></nobr><span class="MJX_Assistive_MathML MJX_Assistive_MathML_Block" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mn>1</mn><mo>+</mo><mrow class="MJX-TeXAtom-ORD"><mo stretchy="false">|</mo></mrow><mo fence="false" stretchy="false">{</mo><mi>d</mi><mo>∈</mo><mi>D</mi><mo>:</mo><mi>c</mi><mo>∈</mo><mi>d</mi><mo fence="false" stretchy="false">}</mo><mrow class="MJX-TeXAtom-ORD"><mo stretchy="false">|</mo></mrow></math></span></span></div><script type="math/tex; mode=display" id="MathJax-Element-18">1+|\{d \in D: c \in d\}|</script>  </p>
 <p>is the number of documents where the concept c appears, and I add the constant 1 to avoid division by zero.</p>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 35px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-1"># Visualizing CFIDF</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 65px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h1 id="Visualizing-CFIDF">Visualizing CFIDF<a class="anchor-link" href="#Visualizing-CFIDF">¶</a></h1>
-</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 365.142px; left: 390.142px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 387px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">CFIDF is great for exploring text that you are conceptually familiar with or where you roughly know what concepts are mentioned. It's also great for comparing text. Take the following ternary plot, for example, where we look at song lyrics. (It should be obvious now <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/january/Cypher/</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>that<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/january/Analyzing-Rap-Lyrics-Using-Word-Vectors/</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>I<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/february/Predicting-Musical-Genres/</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>like<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/june/Expose-Word2vec-Model-with-a-RESTful-API-Using-Only-a-Jupyter-Notebook/</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>rap<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/august/Using-Bigram-Paragraph-Vectors/</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>music<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>).</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">We have specified three concepts to which we want to map artists to a certain degree. If an artist lands in the middle, then they likely write about all three concepts equally. If they land where Jackie Wilson does in this example (left edge), then that means they write about <span class="cm-comment">`family`</span> and <span class="cm-comment">`money`</span> equally but shy away from <span class="cm-comment">`politics`</span>. This exmaple shows that metal and punk artists tend to write about <span class="cm-comment">`politics`</span> more so than <span class="cm-comment">`family`</span> or <span class="cm-comment">`money`</span>. And rap artists tend to rap about <span class="cm-comment">`money`</span> over <span class="cm-comment">`family`</span> and <span class="cm-comment">`politics`</span> in general. Anecdotally, we can confirm this by looking at metal and punk artists like Fear Factory and Rage Against the Machine, two artists known to politic. Also notice the rapper Immortal Technique's position, who is known to engage in political lyricism. It should be no surprise that country artists tend to lean towards <span class="cm-comment">`family`</span> concepts.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 417px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>CFIDF is great for exploring text that you are conceptually familiar with or where you roughly know what concepts are mentioned. It's also great for comparing text. Take the following ternary plot, for example, where we look at song lyrics. (It should be obvious now <a href="https://tmthyjames.github.io/2018/january/Cypher/" target="_blank">that</a> <a href="https://tmthyjames.github.io/2018/january/Analyzing-Rap-Lyrics-Using-Word-Vectors/" target="_blank">I</a> <a href="https://tmthyjames.github.io/2018/february/Predicting-Musical-Genres/" target="_blank">like</a> <a href="https://tmthyjames.github.io/2018/june/Expose-Word2vec-Model-with-a-RESTful-API-Using-Only-a-Jupyter-Notebook/" target="_blank">rap</a> <a href="https://tmthyjames.github.io/2018/august/Using-Bigram-Paragraph-Vectors/" target="_blank">music</a>).</p>
+</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 218.324px; left: 5.59658px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 420px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">CFIDF is great for exploring text that you are conceptually familiar with or where you roughly know what concepts are mentioned. It's also great for comparing text. Take the following ternary plot, for example, where we look at song lyrics. (It should be obvious <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/january/Cypher/</span><span class="cm-string">"</span> <span class="cm-attribute">target</span>=<span class="cm-string">"_blank"</span><span class="cm-tag cm-bracket">&gt;</span>now<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/january/Analyzing-Rap-Lyrics-Using-Word-Vectors/</span><span class="cm-string">"</span> <span class="cm-attribute">target</span>=<span class="cm-string">"_blank"</span><span class="cm-tag cm-bracket">&gt;</span>that<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/february/Predicting-Musical-Genres/</span><span class="cm-string">"</span> <span class="cm-attribute">target</span>=<span class="cm-string">"_blank"</span><span class="cm-tag cm-bracket">&gt;</span>I<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/june/Expose-Word2vec-Model-with-a-RESTful-API-Using-Only-a-Jupyter-Notebook/</span><span class="cm-string">"</span> <span class="cm-attribute">target</span>=<span class="cm-string">"_blank"</span><span class="cm-tag cm-bracket">&gt;</span>love<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://tmthyjames.github.io/2018/august/Using-Bigram-Paragraph-Vectors/</span><span class="cm-string">"</span> <span class="cm-attribute">target</span>=<span class="cm-string">"_blank"</span><span class="cm-tag cm-bracket">&gt;</span>rap<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://www.youtube.com/watch?v=L4Nd7lZgp4o</span><span class="cm-string">"</span> <span class="cm-attribute">target</span>=<span class="cm-string">"_blank"</span><span class="cm-tag cm-bracket">&gt;</span>music<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>).</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">We have specified three concepts to which we want to map artists to a certain degree. If an artist lands in the middle, then they likely write about all three concepts equally. If they land where Jackie Wilson does in this example (left edge), then that means they write about <span class="cm-comment">`family`</span> and <span class="cm-comment">`money`</span> equally but shy away from <span class="cm-comment">`politics`</span>. This exmaple shows that metal and punk artists tend to write about <span class="cm-comment">`politics`</span> more so than <span class="cm-comment">`family`</span> or <span class="cm-comment">`money`</span>. And rap artists tend to rap about <span class="cm-comment">`money`</span> over <span class="cm-comment">`family`</span> and <span class="cm-comment">`politics`</span> in general. Anecdotally, we can confirm this by looking at metal and punk artists like Fear Factory and Rage Against the Machine, two artists known to politic. Also notice the rapper Immortal Technique's position, who is known to engage in political lyricism. It should be no surprise that country artists tend to lean towards <span class="cm-comment">`family`</span> concepts.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 450px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>CFIDF is great for exploring text that you are conceptually familiar with or where you roughly know what concepts are mentioned. It's also great for comparing text. Take the following ternary plot, for example, where we look at song lyrics. (It should be obvious <a href="https://tmthyjames.github.io/2018/january/Cypher/" target="_blank">now</a> <a href="https://tmthyjames.github.io/2018/january/Analyzing-Rap-Lyrics-Using-Word-Vectors/" target="_blank">that</a> <a href="https://tmthyjames.github.io/2018/february/Predicting-Musical-Genres/" target="_blank">I</a> <a href="https://tmthyjames.github.io/2018/june/Expose-Word2vec-Model-with-a-RESTful-API-Using-Only-a-Jupyter-Notebook/" target="_blank">love</a> <a href="https://tmthyjames.github.io/2018/august/Using-Bigram-Paragraph-Vectors/" target="_blank">rap</a> <a href="https://www.youtube.com/watch?v=L4Nd7lZgp4o" target="_blank">music</a>).</p>
 <p>We have specified three concepts to which we want to map artists to a certain degree. If an artist lands in the middle, then they likely write about all three concepts equally. If they land where Jackie Wilson does in this example (left edge), then that means they write about <code>family</code> and <code>money</code> equally but shy away from <code>politics</code>. This exmaple shows that metal and punk artists tend to write about <code>politics</code> more so than <code>family</code> or <code>money</code>. And rap artists tend to rap about <code>money</code> over <code>family</code> and <code>politics</code> in general. Anecdotally, we can confirm this by looking at metal and punk artists like Fear Factory and Rage Against the Machine, two artists known to politic. Also notice the rapper Immortal Technique's position, who is known to engage in political lyricism. It should be no surprise that country artists tend to lean towards <code>family</code> concepts.</p>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">img</span> <span class="cm-attribute">src</span>=<span class="cm-string">"29.png"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag">&lt;/img&gt;</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p><img src="/assets/data/29.png"></p>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 37.8693px; left: 490.142px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 60px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">When the concepts of interest are <span class="cm-comment">`politics`</span>, <span class="cm-comment">`drugs`</span>, and <span class="cm-comment">`sex`</span>, we see pretty definite segmentation: rap leans towards drugs, heavy metal leans toward politics, and R&amp;B dominates the sex category, as one would expect, right?</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 90px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>When the concepts of interest are <code>politics</code>, <code>drugs</code>, and <code>sex</code>, we see pretty definite segmentation: rap leans towards drugs, heavy metal leans toward politics, and R&amp;B dominates the sex category, as one would expect, right?</p>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">img</span> <span class="cm-attribute">src</span>=<span class="cm-string">"19.png"</span><span class="cm-tag cm-bracket">&gt;</span><span class="cm-tag">&lt;/img&gt;</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p><img src="/assets/data/19.png"></p>
-</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 35px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-1"># What it's not</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 65px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h1 id="What-it's-not">What it's not<a class="anchor-link" href="#What-it's-not">¶</a></h1>
+</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59659px; left: 374.687px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 27px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style="visibility: hidden;"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Here's all the CFIDF scores by artist and genre:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 57px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>Here's all the CFIDF scores by artist and genre:</p>
+</div></div></div><div class="cell code_cell rendered un" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[9]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 21.9602px; left: 159.233px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 256.935px; margin-bottom: 0px; border-right-width: 30px; min-height: 76px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style=""></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">import</span> <span class="cm-variable">pandas</span> <span class="cm-keyword">as</span> <span class="cm-variable">pd</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">cfidf</span> = <span class="cm-variable">pd</span>.<span class="cm-property">read_csv</span><span class=" CodeMirror-matchingbracket">(</span><span class="cm-string">'cf-idf.csv'</span><span class=" CodeMirror-matchingbracket">)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">cfidf</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 106px;"></div></div></div></div></div></div><div class="output_wrapper"><div class=" prompt" title="click to unscroll output; double click to hide" style=""></div><div class="output " style=""><div class="output_area"><div class="prompt output_prompt">Out[9]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>drugs</th>
+      <th>family</th>
+      <th>money</th>
+      <th>partying</th>
+      <th>politics</th>
+      <th>religion</th>
+      <th>sex</th>
+      <th>Group</th>
+      <th>Genre</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.151377</td>
+      <td>0.427702</td>
+      <td>0.375632</td>
+      <td>0.301393</td>
+      <td>0.048299</td>
+      <td>0.133169</td>
+      <td>0.129391</td>
+      <td>2Pac</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.239066</td>
+      <td>0.417061</td>
+      <td>0.454616</td>
+      <td>0.370648</td>
+      <td>0.039125</td>
+      <td>0.121863</td>
+      <td>0.135851</td>
+      <td>50_Cent</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.174737</td>
+      <td>0.467548</td>
+      <td>0.179775</td>
+      <td>0.276611</td>
+      <td>0.103990</td>
+      <td>0.132259</td>
+      <td>0.117274</td>
+      <td>7 Seconds</td>
+      <td>punk rock</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.660889</td>
+      <td>0.344094</td>
+      <td>0.455429</td>
+      <td>0.364400</td>
+      <td>0.096142</td>
+      <td>0.125103</td>
+      <td>0.131203</td>
+      <td>A$AP_Rocky</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.034425</td>
+      <td>0.476945</td>
+      <td>0.337638</td>
+      <td>0.417414</td>
+      <td>0.077265</td>
+      <td>0.357589</td>
+      <td>0.231473</td>
+      <td>AC/DC</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.249775</td>
+      <td>0.346488</td>
+      <td>0.260931</td>
+      <td>0.248761</td>
+      <td>0.102499</td>
+      <td>0.090355</td>
+      <td>0.099653</td>
+      <td>AZ</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.032446</td>
+      <td>0.483345</td>
+      <td>0.203328</td>
+      <td>0.316998</td>
+      <td>0.148683</td>
+      <td>0.202916</td>
+      <td>0.160069</td>
+      <td>Accept</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.000000</td>
+      <td>0.685787</td>
+      <td>0.522545</td>
+      <td>0.436630</td>
+      <td>0.051919</td>
+      <td>0.498870</td>
+      <td>0.404920</td>
+      <td>Adele</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.000000</td>
+      <td>0.900886</td>
+      <td>0.560054</td>
+      <td>0.697584</td>
+      <td>0.046892</td>
+      <td>0.695580</td>
+      <td>0.627945</td>
+      <td>Al Green</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.053640</td>
+      <td>0.647162</td>
+      <td>0.509189</td>
+      <td>0.414272</td>
+      <td>0.119802</td>
+      <td>0.484224</td>
+      <td>0.273535</td>
+      <td>Alan Jackson</td>
+      <td>Country</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.046781</td>
+      <td>0.526274</td>
+      <td>0.384845</td>
+      <td>0.353584</td>
+      <td>0.153123</td>
+      <td>0.268308</td>
+      <td>0.244421</td>
+      <td>Alice Cooper</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>0.000000</td>
+      <td>0.479292</td>
+      <td>0.178801</td>
+      <td>0.292639</td>
+      <td>0.000000</td>
+      <td>0.218498</td>
+      <td>0.137328</td>
+      <td>Alice in Chains</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>0.035913</td>
+      <td>0.596436</td>
+      <td>0.392878</td>
+      <td>0.366707</td>
+      <td>0.070529</td>
+      <td>0.406749</td>
+      <td>0.253452</td>
+      <td>Alison Krauss</td>
+      <td>Country</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>0.030683</td>
+      <td>0.297049</td>
+      <td>0.028043</td>
+      <td>0.125625</td>
+      <td>0.388327</td>
+      <td>0.140677</td>
+      <td>0.035558</td>
+      <td>Amon Amarth</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>0.257458</td>
+      <td>0.641693</td>
+      <td>0.439047</td>
+      <td>0.418453</td>
+      <td>0.028090</td>
+      <td>0.364027</td>
+      <td>0.269258</td>
+      <td>Amy Winehouse</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>0.020131</td>
+      <td>0.937717</td>
+      <td>0.728164</td>
+      <td>0.644628</td>
+      <td>0.000000</td>
+      <td>0.750571</td>
+      <td>0.685267</td>
+      <td>Anita Baker</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>0.000000</td>
+      <td>0.656679</td>
+      <td>0.391062</td>
+      <td>0.401276</td>
+      <td>0.053439</td>
+      <td>0.426590</td>
+      <td>0.298280</td>
+      <td>Anne Murray</td>
+      <td>Country</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>0.042059</td>
+      <td>0.456947</td>
+      <td>0.168757</td>
+      <td>0.235924</td>
+      <td>0.119311</td>
+      <td>0.155751</td>
+      <td>0.081028</td>
+      <td>Anthrax</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>0.058171</td>
+      <td>0.503801</td>
+      <td>0.246655</td>
+      <td>0.323619</td>
+      <td>0.247526</td>
+      <td>0.212399</td>
+      <td>0.137969</td>
+      <td>Anti-Nowhere League</td>
+      <td>punk rock</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>0.062821</td>
+      <td>0.397296</td>
+      <td>0.151164</td>
+      <td>0.269749</td>
+      <td>0.511776</td>
+      <td>0.118351</td>
+      <td>0.104213</td>
+      <td>Anti‐Flag</td>
+      <td>punk rock</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>0.028504</td>
+      <td>0.820412</td>
+      <td>0.606775</td>
+      <td>0.593966</td>
+      <td>0.054282</td>
+      <td>0.700646</td>
+      <td>0.616238</td>
+      <td>Aretha Franklin</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>0.022174</td>
+      <td>0.525510</td>
+      <td>0.147532</td>
+      <td>0.261213</td>
+      <td>0.145159</td>
+      <td>0.130319</td>
+      <td>0.106520</td>
+      <td>Avenged Sevenfold</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>0.000000</td>
+      <td>0.905792</td>
+      <td>0.458609</td>
+      <td>0.630811</td>
+      <td>0.038014</td>
+      <td>0.573877</td>
+      <td>0.607313</td>
+      <td>B.B. King</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>0.159230</td>
+      <td>0.462897</td>
+      <td>0.354108</td>
+      <td>0.386592</td>
+      <td>0.099894</td>
+      <td>0.113994</td>
+      <td>0.184632</td>
+      <td>B.o.B</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>0.014794</td>
+      <td>0.378958</td>
+      <td>0.138150</td>
+      <td>0.217477</td>
+      <td>0.380938</td>
+      <td>0.129712</td>
+      <td>0.074173</td>
+      <td>Bad Religion</td>
+      <td>punk rock</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>0.171185</td>
+      <td>0.370992</td>
+      <td>0.292913</td>
+      <td>0.273246</td>
+      <td>0.037355</td>
+      <td>0.065371</td>
+      <td>0.089830</td>
+      <td>Bad_Meets_Evil</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>0.032547</td>
+      <td>0.775277</td>
+      <td>0.555606</td>
+      <td>0.495916</td>
+      <td>0.042612</td>
+      <td>0.525926</td>
+      <td>0.386995</td>
+      <td>Barbara Mandrell</td>
+      <td>Country</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>0.000000</td>
+      <td>1.000000</td>
+      <td>0.745141</td>
+      <td>0.808837</td>
+      <td>0.000000</td>
+      <td>0.836872</td>
+      <td>0.943167</td>
+      <td>Barry White</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>0.017855</td>
+      <td>0.772672</td>
+      <td>0.545288</td>
+      <td>0.629006</td>
+      <td>0.000000</td>
+      <td>0.474196</td>
+      <td>0.525784</td>
+      <td>Beyoncé Knowles</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>0.245185</td>
+      <td>0.413275</td>
+      <td>0.331191</td>
+      <td>0.358828</td>
+      <td>0.015286</td>
+      <td>0.065510</td>
+      <td>0.146883</td>
+      <td>Big_Boi</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>362</th>
+      <td>0.000000</td>
+      <td>0.632911</td>
+      <td>0.441297</td>
+      <td>0.420136</td>
+      <td>0.040967</td>
+      <td>0.450969</td>
+      <td>0.357437</td>
+      <td>Trisha Yearwood</td>
+      <td>Country</td>
+    </tr>
+    <tr>
+      <th>363</th>
+      <td>0.320308</td>
+      <td>0.403973</td>
+      <td>0.401622</td>
+      <td>0.357915</td>
+      <td>0.054575</td>
+      <td>0.116402</td>
+      <td>0.144865</td>
+      <td>Twista</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>364</th>
+      <td>0.010390</td>
+      <td>0.658518</td>
+      <td>0.299632</td>
+      <td>0.429956</td>
+      <td>0.027208</td>
+      <td>0.416839</td>
+      <td>0.212274</td>
+      <td>Twisted Sister</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>365</th>
+      <td>0.164294</td>
+      <td>0.415106</td>
+      <td>0.326170</td>
+      <td>0.316618</td>
+      <td>0.112228</td>
+      <td>0.104804</td>
+      <td>0.128864</td>
+      <td>Tyler,_The_Creator</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>366</th>
+      <td>0.037013</td>
+      <td>0.457210</td>
+      <td>0.265354</td>
+      <td>0.285825</td>
+      <td>0.072690</td>
+      <td>0.329173</td>
+      <td>0.172931</td>
+      <td>Type O Negative</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>367</th>
+      <td>0.007734</td>
+      <td>0.730533</td>
+      <td>0.603650</td>
+      <td>0.657350</td>
+      <td>0.030378</td>
+      <td>0.315966</td>
+      <td>0.594983</td>
+      <td>Tyrese Gibson</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>368</th>
+      <td>0.014057</td>
+      <td>0.649171</td>
+      <td>0.404000</td>
+      <td>0.424277</td>
+      <td>0.079751</td>
+      <td>0.396563</td>
+      <td>0.284272</td>
+      <td>UFO</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>369</th>
+      <td>0.007463</td>
+      <td>0.624370</td>
+      <td>0.373314</td>
+      <td>0.370615</td>
+      <td>0.097705</td>
+      <td>0.360790</td>
+      <td>0.242315</td>
+      <td>Uriah Heep</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>370</th>
+      <td>0.016748</td>
+      <td>0.758233</td>
+      <td>0.523127</td>
+      <td>0.666694</td>
+      <td>0.005482</td>
+      <td>0.343238</td>
+      <td>0.544873</td>
+      <td>Usher</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>371</th>
+      <td>0.006117</td>
+      <td>0.664322</td>
+      <td>0.476895</td>
+      <td>0.535035</td>
+      <td>0.072075</td>
+      <td>0.457920</td>
+      <td>0.404772</td>
+      <td>Van Halen</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>372</th>
+      <td>0.081082</td>
+      <td>0.275381</td>
+      <td>0.088967</td>
+      <td>0.149084</td>
+      <td>0.329089</td>
+      <td>0.225467</td>
+      <td>0.076623</td>
+      <td>Venom</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>373</th>
+      <td>0.000000</td>
+      <td>0.687720</td>
+      <td>0.361110</td>
+      <td>0.427076</td>
+      <td>0.020911</td>
+      <td>0.394013</td>
+      <td>0.310108</td>
+      <td>Vince Gill</td>
+      <td>Country</td>
+    </tr>
+    <tr>
+      <th>374</th>
+      <td>0.035617</td>
+      <td>0.608620</td>
+      <td>0.344285</td>
+      <td>0.398376</td>
+      <td>0.233158</td>
+      <td>0.348415</td>
+      <td>0.246486</td>
+      <td>Violent Femmes</td>
+      <td>punk rock</td>
+    </tr>
+    <tr>
+      <th>375</th>
+      <td>0.032590</td>
+      <td>0.547653</td>
+      <td>0.294348</td>
+      <td>0.316193</td>
+      <td>0.192013</td>
+      <td>0.462534</td>
+      <td>0.257751</td>
+      <td>W.A.S.P.</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>376</th>
+      <td>0.205116</td>
+      <td>0.394842</td>
+      <td>0.389623</td>
+      <td>0.302427</td>
+      <td>0.033569</td>
+      <td>0.116834</td>
+      <td>0.133046</td>
+      <td>Warren_G</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>377</th>
+      <td>0.030052</td>
+      <td>0.613280</td>
+      <td>0.346167</td>
+      <td>0.373449</td>
+      <td>0.102906</td>
+      <td>0.313079</td>
+      <td>0.258100</td>
+      <td>Waylon Jennings</td>
+      <td>Country</td>
+    </tr>
+    <tr>
+      <th>378</th>
+      <td>0.000000</td>
+      <td>0.379652</td>
+      <td>0.234339</td>
+      <td>0.368102</td>
+      <td>0.139130</td>
+      <td>0.271915</td>
+      <td>0.235558</td>
+      <td>White Zombie</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>379</th>
+      <td>0.009354</td>
+      <td>0.805518</td>
+      <td>0.764349</td>
+      <td>0.591093</td>
+      <td>0.067360</td>
+      <td>0.630351</td>
+      <td>0.594585</td>
+      <td>Whitesnake</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>380</th>
+      <td>0.000000</td>
+      <td>0.812481</td>
+      <td>0.629915</td>
+      <td>0.574522</td>
+      <td>0.019814</td>
+      <td>0.612128</td>
+      <td>0.594845</td>
+      <td>Whitney Houston</td>
+      <td>rhythm and blues</td>
+    </tr>
+    <tr>
+      <th>381</th>
+      <td>0.050114</td>
+      <td>0.478771</td>
+      <td>0.227129</td>
+      <td>0.350105</td>
+      <td>0.082015</td>
+      <td>0.130546</td>
+      <td>0.208611</td>
+      <td>Will_Smith</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>382</th>
+      <td>0.052394</td>
+      <td>0.638656</td>
+      <td>0.343738</td>
+      <td>0.357677</td>
+      <td>0.135236</td>
+      <td>0.357768</td>
+      <td>0.233339</td>
+      <td>Willie Nelson</td>
+      <td>Country</td>
+    </tr>
+    <tr>
+      <th>383</th>
+      <td>0.135084</td>
+      <td>0.231607</td>
+      <td>0.124481</td>
+      <td>0.160269</td>
+      <td>0.141489</td>
+      <td>0.153111</td>
+      <td>0.076997</td>
+      <td>Wire</td>
+      <td>punk rock</td>
+    </tr>
+    <tr>
+      <th>384</th>
+      <td>0.776054</td>
+      <td>0.420987</td>
+      <td>0.546276</td>
+      <td>0.376374</td>
+      <td>0.069092</td>
+      <td>0.102349</td>
+      <td>0.145945</td>
+      <td>Wiz_Khalifa</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>385</th>
+      <td>0.189808</td>
+      <td>0.464809</td>
+      <td>0.269780</td>
+      <td>0.359945</td>
+      <td>0.045183</td>
+      <td>0.185374</td>
+      <td>0.187468</td>
+      <td>X</td>
+      <td>punk rock</td>
+    </tr>
+    <tr>
+      <th>386</th>
+      <td>0.204148</td>
+      <td>0.369473</td>
+      <td>0.307254</td>
+      <td>0.298508</td>
+      <td>0.092521</td>
+      <td>0.062660</td>
+      <td>0.100177</td>
+      <td>Xzibit</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>387</th>
+      <td>0.173154</td>
+      <td>0.414595</td>
+      <td>0.325445</td>
+      <td>0.331869</td>
+      <td>0.110114</td>
+      <td>0.140262</td>
+      <td>0.139033</td>
+      <td>Yelawolf</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>388</th>
+      <td>0.011097</td>
+      <td>0.470948</td>
+      <td>0.201246</td>
+      <td>0.289181</td>
+      <td>0.217937</td>
+      <td>0.289195</td>
+      <td>0.153054</td>
+      <td>Yngwie Malmsteen</td>
+      <td>heavy metal</td>
+    </tr>
+    <tr>
+      <th>389</th>
+      <td>0.284804</td>
+      <td>0.417470</td>
+      <td>0.415205</td>
+      <td>0.379049</td>
+      <td>0.050196</td>
+      <td>0.061686</td>
+      <td>0.086339</td>
+      <td>Young_Jeezy</td>
+      <td>Hip Hop</td>
+    </tr>
+    <tr>
+      <th>390</th>
+      <td>0.026043</td>
+      <td>0.679013</td>
+      <td>0.399591</td>
+      <td>0.385002</td>
+      <td>0.187538</td>
+      <td>0.324088</td>
+      <td>0.203139</td>
+      <td>Zac Brown Band</td>
+      <td>Country</td>
+    </tr>
+    <tr>
+      <th>391</th>
+      <td>0.057894</td>
+      <td>0.590785</td>
+      <td>0.230635</td>
+      <td>0.304427</td>
+      <td>0.081213</td>
+      <td>0.191311</td>
+      <td>0.142993</td>
+      <td>motörhead</td>
+      <td>heavy metal</td>
+    </tr>
+  </tbody>
+</table>
+<p>392 rows × 9 columns</p>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 35px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-1"># What it's not</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 65px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h1 id="What-it's-not">What it's not<a class="anchor-link" href="#What-it's-not">¶</a></h1>
 </div></div></div><div class="cell text_cell rendered un" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 168.778px; left: 43.7784px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 191px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors" style=""></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• Although possible, CFIDF is not meant to be used as a predictive algorithm. You're much better off using your word embeddings as features instead of the learned features <span class="cm-em">*produced*</span> by your word embeddings.</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">• CFIDF is not designed for topic modeling as it doesn't "discover" topics. CFIDF assumes you've specified your topics (or concepts) of interest a priori. It may be helpful for a priori topic/concept analysis though. </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">On the other hand, it works great for texts where you have a set of concepts you're interested in analyzing, where you may have a lot of overlapping language (money vs cash), and/or where you know (roughly) what concepts exist in the text already. </span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 221px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>• Although possible, CFIDF is not meant to be used as a predictive algorithm. You're much better off using your word embeddings as features instead of the learned features <em>produced</em> by your word embeddings.</p>
 <p>• CFIDF is not designed for topic modeling as it doesn't "discover" topics. CFIDF assumes you've specified your topics (or concepts) of interest a priori. It may be helpful for a priori topic/concept analysis though. </p>
 <p>On the other hand, it works great for texts where you have a set of concepts you're interested in analyzing, where you may have a lot of overlapping language (money vs cash), and/or where you know (roughly) what concepts exist in the text already. </p>
