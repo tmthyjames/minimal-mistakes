@@ -1,0 +1,1384 @@
+--- 
+title: "SQLCell 2.0: Redesigning SQLCell for JupyterLab" 
+author_profile: false 
+author: Tim Dobbins 
+excerpt: "I've been meaning to revisit SQLCell for some time. Besides the codebase being a product of my early days of learning how to program and that making contributions was cumbersome due to the poor design of the API, the real force behind me refactoring was that I've been using Jupyter Lab a lot lately and I still hate most SQL interfaces." 
+categories: [2019, May] 
+tags: [SQL, python, jupyter-notebook, jupyter-lab, data-science, series, SQLCell, tools]
+---
+<link rel="stylesheet" type="text/css" href="/assets/css/ipython.css">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+<style>
+div.output_area{max-height:400px;}
+.button-sect{margin:2px;}
+</style><link rel="stylesheet" type="text/css" href="/assets/css/ipython.css"><div class="cell text_cell rendered " tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 825px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">I've been meaning to revisit <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://github.com/tmthyjames/SQLCell</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>SQLCell<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> for some time. Besides the codebase being a product of my early days of learning how to program and that making contributions was cumbersome due to the poor design of the API, the real force behind me refactoring was that I've been using Jupyter Lab a lot lately and I still hate most SQL interfaces. I like the freedom of being able to use Jupyter as a pseudo-SQL app—there's not as much functionality as a fully fledged SQL interface, but for most of my needs, I just need to write queries; I don't need the same level of utility as a DBA would. </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Therefore, I'm refactoring SQLCell completely to work with both Jupyter Notebook and Jupyter Lab. The major differences in this release are:</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-comment">1) No UI buttons or graphs (yet)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-comment">2) The API is a lot cleaner</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"> &nbsp; &nbsp;</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Back in the day of Jupyter Notebooks, you could publish a notebook that injected malicious Javascript onto a user's computer. Now, <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/JavaScript%20Notebook%20Extensions.html</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>that is no longer (publicly) possible<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>. I say public, because there's not a public Javascript API for Lab like there is for Notebook. This comes with its benefits and costs, as is reflected in many Github conversations (<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://github.com/jupyterlab/jupyterlab/issues/3118</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>here<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> and <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://github.com/jupyterlab/jupyterlab/issues/3748</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>here<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span> and <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://github.com/jupyterlab/jupyterlab/pull/2595</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>here<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>). With that, I am still looking into building graphs and UI features into a future version. And hopefully this release will attract more contributors as the API is much cleaner than version 1's.</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Here are the features I'm starting with:</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-quote cm-quote-1">&gt;</span><span class="cm-header cm-header-3 cm-quote cm-quote-1">### </span><span class="cm-link cm-header cm-header-3 cm-quote cm-quote-1">[Engine Persistence]</span><span class="cm-string cm-url cm-header cm-header-3 cm-quote cm-quote-1">(#Engine-Persistence)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-quote cm-quote-1">&gt;</span><span class="cm-header cm-header-3 cm-quote cm-quote-1">### </span><span class="cm-link cm-header cm-header-3 cm-quote cm-quote-1">[Python Variables as Query Parameters]</span><span class="cm-string cm-url cm-header cm-header-3 cm-quote cm-quote-1">(#Python-Variables-as-Query-Parameters)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-quote cm-quote-1">&gt;</span><span class="cm-header cm-header-3 cm-quote cm-quote-1">### </span><span class="cm-link cm-header cm-header-3 cm-quote cm-quote-1">[Engine Aliasing]</span><span class="cm-string cm-url cm-header cm-header-3 cm-quote cm-quote-1">(#Engine-Aliasing)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-quote cm-quote-1">&gt;</span><span class="cm-header cm-header-3 cm-quote cm-quote-1">### </span><span class="cm-link cm-header cm-header-3 cm-quote cm-quote-1">[Defining and Persisting Hooks]</span><span class="cm-string cm-url cm-header cm-header-3 cm-quote cm-quote-1">(#Defining-and-Persisting-Hooks)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-quote cm-quote-1">&gt;</span><span class="cm-header cm-header-3 cm-quote cm-quote-1">### </span><span class="cm-link cm-header cm-header-3 cm-quote cm-quote-1">[Write SQL Output to Session Variable]</span><span class="cm-string cm-url cm-header cm-header-3 cm-quote cm-quote-1">(#Write-SQL-Output-to-Session-Variable)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-quote cm-quote-1">&gt;</span><span class="cm-header cm-header-3 cm-quote cm-quote-1">### </span><span class="cm-link cm-header cm-header-3 cm-quote cm-quote-1">[Background Queries]</span><span class="cm-string cm-url cm-header cm-header-3 cm-quote cm-quote-1">(#Background-Queries)</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">To install SQLCell use <span class="cm-comment">`pip`</span>:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 855px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>I've been meaning to revisit <a href="https://github.com/tmthyjames/SQLCell" target="_blank">SQLCell</a> for some time. Besides the codebase being a product of my early days of learning how to program and that making contributions was cumbersome due to the poor design of the API, the real force behind me refactoring was that I've been using Jupyter Lab a lot lately and I still hate most SQL interfaces. I like the freedom of being able to use Jupyter as a pseudo-SQL app—there's not as much functionality as a fully fledged SQL interface, but for most of my needs, I just need to write queries; I don't need the same level of utility as a DBA would. </p>
+<p>Therefore, I'm refactoring SQLCell completely to work with both Jupyter Notebook and Jupyter Lab. The major differences in this release are:</p>
+<pre><code>1) No UI buttons or graphs (yet)
+2) The API is a lot cleaner
+</code></pre><p>Back in the day of Jupyter Notebooks, you could publish a notebook that injected malicious Javascript onto a user's computer. Now, <a href="https://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/JavaScript%20Notebook%20Extensions.html" target="_blank">that is no longer (publicly) possible</a>. I say public, because there's not a public Javascript API for Lab like there is for Notebook. This comes with its benefits and costs, as is reflected in many Github conversations (<a href="https://github.com/jupyterlab/jupyterlab/issues/3118" target="_blank">here</a> and <a href="https://github.com/jupyterlab/jupyterlab/issues/3748" target="_blank">here</a> and <a href="https://github.com/jupyterlab/jupyterlab/pull/2595" target="_blank">here</a>). With that, I am still looking into building graphs and UI features into a future version. And hopefully this release will attract more contributors as the API is much cleaner than version 1's.</p>
+<p>Here are the features I'm starting with:</p>
+<blockquote>
+<h3 id="Engine-Persistence"><a href="#Engine-Persistence">Engine Persistence</a><a class="anchor-link" href="#Engine-Persistence">¶</a></h3>
+<h3 id="Python-Variables-as-Query-Parameters"><a href="#Python-Variables-as-Query-Parameters">Python Variables as Query Parameters</a><a class="anchor-link" href="#Python-Variables-as-Query-Parameters">¶</a></h3>
+<h3 id="Engine-Aliasing"><a href="#Engine-Aliasing">Engine Aliasing</a><a class="anchor-link" href="#Engine-Aliasing">¶</a></h3>
+<h3 id="Defining-and-Persisting-Hooks"><a href="#Defining-and-Persisting-Hooks">Defining and Persisting Hooks</a><a class="anchor-link" href="#Defining-and-Persisting-Hooks">¶</a></h3>
+<h3 id="Write-SQL-Output-to-Session-Variable"><a href="#Write-SQL-Output-to-Session-Variable">Write SQL Output to Session Variable</a><a class="anchor-link" href="#Write-SQL-Output-to-Session-Variable">¶</a></h3>
+<h3 id="Background-Queries"><a href="#Background-Queries">Background Queries</a><a class="anchor-link" href="#Background-Queries">¶</a></h3>
+</blockquote>
+<p>To install SQLCell use <code>pip</code>:</p>
+</div></div></div><div class="cell text_cell un unrendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">pip install sqlcell</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"></div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Then load it in your Notebook/Lab by using the <span class="cm-comment">`%load_ext`</span> command:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>Then load it in your Notebook/Lab by using the <code>%load_ext</code> command:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[1]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 195px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-operator">%</span><span class="cm-variable">load_ext</span> <span class="cm-variable">sqlcell</span>.<span class="cm-property">sqlcell</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style="display: none;"></div><div class="output" style="display: none;"></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 33px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-2">## Engine Persistence</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 63px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h2 id="Engine-Persistence">Engine Persistence<a class="anchor-link" href="#Engine-Persistence">¶</a></h2>
+</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">The first time you use <span class="cm-comment">`%%sql`</span>, you'll need to pass your connection string as an <span class="cm-comment">`--engine`</span> argument.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>The first time you use <code>%%sql</code>, you'll need to pass your connection string as an <code>--engine</code> argument.</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[19]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 610.906px; margin-bottom: 0px; border-right-width: 30px; min-height: 113px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --engine=mssql+pymssql://SomeUserName:SomePassword@SomeHostName/tdobbins</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">SELECT</span> TOP <span class="cm-number">2</span> N1.*</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">FROM</span> NashvilleHousingMSSQL N1</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">JOIN</span> NashvilleHousingMSSQL N2 <span class="cm-keyword">ON</span> N2<span class="cm-variable-2">.ParcelID</span> = N1<span class="cm-variable-2">.ParcelID</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">ORDER</span> <span class="cm-keyword">BY</span> Address <span class="cm-keyword">DESC</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 143px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[19]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>Acreage</th>
+      <th>Address</th>
+      <th>Bedrooms</th>
+      <th>BuildingValue</th>
+      <th>City</th>
+      <th>ExteriorWall</th>
+      <th>FinishedArea</th>
+      <th>FoundationType</th>
+      <th>FullBath</th>
+      <th>Grade</th>
+      <th>...</th>
+      <th>SalePrice</th>
+      <th>SoldAsVacant</th>
+      <th>State</th>
+      <th>Suite/Condo#</th>
+      <th>TaxDistrict</th>
+      <th>TotalValue</th>
+      <th>Unnamed:0</th>
+      <th>Unnamed:0.1</th>
+      <th>YearBuilt</th>
+      <th>image</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.11</td>
+      <td>804  LENA ST</td>
+      <td>None</td>
+      <td>0.0</td>
+      <td>NASHVILLE</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>No</td>
+      <td>TN</td>
+      <td>None</td>
+      <td>URBAN SERVICES DISTRICT</td>
+      <td>9000.0</td>
+      <td>87</td>
+      <td>87</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.11</td>
+      <td>804  LENA ST</td>
+      <td>None</td>
+      <td>0.0</td>
+      <td>NASHVILLE</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>...</td>
+      <td>16000</td>
+      <td>No</td>
+      <td>TN</td>
+      <td>None</td>
+      <td>URBAN SERVICES DISTRICT</td>
+      <td>9000.0</td>
+      <td>87</td>
+      <td>87</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 31 columns</p>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 96px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">After that, SQLCell will create a few aliases for you to easily refer to the engine you're wanting to run against. Now you can pass the entire connection string or either the hostname or the database name, and <span class="cm-comment">`%%sql`</span> will use the same engine for all three. Note, if you have two databases with the same name, consider just using the hostname.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 126px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>After that, SQLCell will create a few aliases for you to easily refer to the engine you're wanting to run against. Now you can pass the entire connection string or either the hostname or the database name, and <code>%%sql</code> will use the same engine for all three. Note, if you have two databases with the same name, consider just using the hostname.</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[3]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 203px; margin-bottom: 0px; border-right-width: 30px; min-height: 79px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --engine=SomeHostName</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">        </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">SELECT</span> TOP <span class="cm-number">2</span> * </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">FROM</span> NashvilleHousingMSSQL</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 109px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[3]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>Acreage</th>
+      <th>Address</th>
+      <th>Bedrooms</th>
+      <th>BuildingValue</th>
+      <th>City</th>
+      <th>ExteriorWall</th>
+      <th>FinishedArea</th>
+      <th>FoundationType</th>
+      <th>FullBath</th>
+      <th>Grade</th>
+      <th>...</th>
+      <th>SalePrice</th>
+      <th>SoldAsVacant</th>
+      <th>State</th>
+      <th>Suite/Condo#</th>
+      <th>TaxDistrict</th>
+      <th>TotalValue</th>
+      <th>Unnamed:0</th>
+      <th>Unnamed:0.1</th>
+      <th>YearBuilt</th>
+      <th>image</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.76</td>
+      <td>5316  OVERTON RD</td>
+      <td>4.0</td>
+      <td>300400.0</td>
+      <td>NASHVILLE</td>
+      <td>BRICK</td>
+      <td>2370.0</td>
+      <td>FULL BSMT</td>
+      <td>2.0</td>
+      <td>B</td>
+      <td>...</td>
+      <td>267300</td>
+      <td>No</td>
+      <td>TN</td>
+      <td>None</td>
+      <td>URBAN SERVICES DISTRICT</td>
+      <td>355400.0</td>
+      <td>24</td>
+      <td>24</td>
+      <td>1968.0</td>
+      <td>\184000\836001.JPG</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>...</td>
+      <td>207000</td>
+      <td>No</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>59</td>
+      <td>59</td>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 31 columns</p>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">`%%sql`</span> will also remember the last used engine so you don't have to refer to it everytime you run a query.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p><code>%%sql</code> will also remember the last used engine so you don't have to refer to it everytime you run a query.</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[15]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 203px; margin-bottom: 0px; border-right-width: 30px; min-height: 79px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">        </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">SELECT</span> TOP <span class="cm-number">2</span> * </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">FROM</span> NashvilleHousingMSSQL</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 109px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[15]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>Acreage</th>
+      <th>Address</th>
+      <th>Bedrooms</th>
+      <th>BuildingValue</th>
+      <th>City</th>
+      <th>ExteriorWall</th>
+      <th>FinishedArea</th>
+      <th>FoundationType</th>
+      <th>FullBath</th>
+      <th>Grade</th>
+      <th>...</th>
+      <th>SalePrice</th>
+      <th>SoldAsVacant</th>
+      <th>State</th>
+      <th>Suite/Condo#</th>
+      <th>TaxDistrict</th>
+      <th>TotalValue</th>
+      <th>Unnamed:0</th>
+      <th>Unnamed:0.1</th>
+      <th>YearBuilt</th>
+      <th>image</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.76</td>
+      <td>5316  OVERTON RD</td>
+      <td>4.0</td>
+      <td>300400.0</td>
+      <td>NASHVILLE</td>
+      <td>BRICK</td>
+      <td>2370.0</td>
+      <td>FULL BSMT</td>
+      <td>2.0</td>
+      <td>B</td>
+      <td>...</td>
+      <td>267300</td>
+      <td>No</td>
+      <td>TN</td>
+      <td>None</td>
+      <td>URBAN SERVICES DISTRICT</td>
+      <td>355400.0</td>
+      <td>24</td>
+      <td>24</td>
+      <td>1968.0</td>
+      <td>\184000\836001.JPG</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>...</td>
+      <td>207000</td>
+      <td>No</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>59</td>
+      <td>59</td>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 31 columns</p>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 33px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-2">## Python Variables as Query Parameters</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 63px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h2 id="Python-Variables-as-Query-Parameters">Python Variables as Query Parameters<a class="anchor-link" href="#Python-Variables-as-Query-Parameters">¶</a></h2>
+</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">If you want to pass Python variables to your query, you can use the colon (<span class="cm-comment">`foo = :foo`</span>) syntax (similar to SQLAlchemy's usage).</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>If you want to pass Python variables to your query, you can use the colon (<code>foo = :foo</code>) syntax (similar to SQLAlchemy's usage).</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[14]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 341.625px; margin-bottom: 0px; border-right-width: 30px; min-height: 62px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">foo</span> = <span class="cm-string">'NASHVILLE'</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">bar</span> = <span class="cm-number">132000</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">baz</span> = (<span class="cm-string">'SINGLE FAMILY'</span>, <span class="cm-string">'RESIDENTIAL CONDO'</span>)</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 92px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style="display: none;"></div><div class="output" style="display: none;"></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[5]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 210.75px; margin-bottom: 0px; border-right-width: 30px; min-height: 130px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --engine=SomeHostName</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">        </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">select</span> * </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">from</span> NashvilleHousingMSSQL</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">where</span> PropertyCity = :foo</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">    <span class="cm-keyword">and</span> SalePrice <span class="cm-keyword">like</span> :bar</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">    <span class="cm-keyword">and</span> LandUse <span class="cm-keyword">in</span> :baz</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 160px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[5]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>Acreage</th>
+      <th>Address</th>
+      <th>Bedrooms</th>
+      <th>BuildingValue</th>
+      <th>City</th>
+      <th>ExteriorWall</th>
+      <th>FinishedArea</th>
+      <th>FoundationType</th>
+      <th>FullBath</th>
+      <th>Grade</th>
+      <th>...</th>
+      <th>SalePrice</th>
+      <th>SoldAsVacant</th>
+      <th>State</th>
+      <th>Suite/Condo#</th>
+      <th>TaxDistrict</th>
+      <th>TotalValue</th>
+      <th>Unnamed:0</th>
+      <th>Unnamed:0.1</th>
+      <th>YearBuilt</th>
+      <th>image</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>...</td>
+      <td>132000</td>
+      <td>No</td>
+      <td>None</td>
+      <td>8</td>
+      <td>None</td>
+      <td>None</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>...</td>
+      <td>132000</td>
+      <td>No</td>
+      <td>None</td>
+      <td>8</td>
+      <td>None</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 31 columns</p>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">And the same with a Postgres dialect:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>And the same with a Postgres dialect:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[7]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 341.625px; margin-bottom: 0px; border-right-width: 30px; min-height: 62px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">foo</span> = <span class="cm-string">'NASHVILLE'</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">bar</span> = <span class="cm-number">132000</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">baz</span> = (<span class="cm-string">'SINGLE FAMILY'</span>, <span class="cm-string">'RESIDENTIAL CONDO'</span>)</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 92px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style="display: none;"></div><div class="output" style="display: none;"></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[8]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 518.609px; margin-bottom: 0px; border-right-width: 30px; min-height: 130px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --engine=PG</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">select</span> n2.* </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">from</span> <span class="cm-string">"NashvilleHousingPostgres"</span> n1</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">JOIN</span> <span class="cm-string">"NashvilleHousingPostgres"</span> n2 <span class="cm-keyword">on</span> n2.<span class="cm-string">"ParcelID"</span> = n1.<span class="cm-string">"ParcelID"</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">where</span> n2.<span class="cm-string">"PropertyCity"</span> = :foo</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">    <span class="cm-keyword">and</span> n2.<span class="cm-string">"SalePrice"</span> = :bar</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">    <span class="cm-keyword">and</span> n2.<span class="cm-string">"LandUse"</span> <span class="cm-keyword">in</span> :baz</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 160px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[8]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>Acreage</th>
+      <th>Address</th>
+      <th>Bedrooms</th>
+      <th>BuildingValue</th>
+      <th>City</th>
+      <th>ExteriorWall</th>
+      <th>FinishedArea</th>
+      <th>FoundationType</th>
+      <th>FullBath</th>
+      <th>Grade</th>
+      <th>...</th>
+      <th>PropertyCity</th>
+      <th>SaleDate</th>
+      <th>SalePrice</th>
+      <th>SoldAsVacant</th>
+      <th>State</th>
+      <th>Suite/Condo#</th>
+      <th>TaxDistrict</th>
+      <th>TotalValue</th>
+      <th>YearBuilt</th>
+      <th>image</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>...</td>
+      <td>NASHVILLE</td>
+      <td>2013-01-24</td>
+      <td>132000</td>
+      <td>No</td>
+      <td>None</td>
+      <td>8</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+<p>1 rows × 29 columns</p>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 33px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-2">## Engine Aliasing</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 63px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h2 id="Engine-Aliasing">Engine Aliasing<a class="anchor-link" href="#Engine-Aliasing">¶</a></h2>
+</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 62px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Similar to <span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">a</span> <span class="cm-attribute">href</span>=<span class="cm-string">"</span><span class="cm-string cm-link">https://github.com/tmthyjames/SQLCell#declare-engines</span><span class="cm-string">"</span><span class="cm-tag cm-bracket">&gt;</span>version 1<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">a</span><span class="cm-tag cm-bracket">&gt;</span>, you can also alias engine strings. Unlike version 1, there are no UI buttons (yet). Using the following syntax:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 92px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>Similar to <a href="https://github.com/tmthyjames/SQLCell#declare-engines" target="_blank">version 1</a>, you can also alias engine strings. Unlike version 1, there are no UI buttons (yet). Using the following syntax:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[5]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 526px; margin-bottom: 0px; border-right-width: 30px; min-height: 130px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --engines</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">PG=postgresql://username:@localhost/db</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">MSS=mssql+pymssql://SomeUserName:SomePassword@180.<span class="cm-number">36.3</span>.<span class="cm-number">76</span>/tdobbins</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">LC=mssql+pymssql://username:password@180.<span class="cm-number">36.2</span>.<span class="cm-number">90</span>/DB1</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 160px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[5]:</div><div class="output_subarea output_text output_result"><pre>'Engines successfully registered'</pre></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">we can now use <span class="cm-comment">`%%sql`</span> with an alias as our <span class="cm-comment">`--engine`</span> parameter:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>we can now use <code>%%sql</code> with an alias as our <code>--engine</code> parameter:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[6]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 318px; margin-bottom: 0px; border-right-width: 30px; min-height: 62px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --engine=MSS</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">select</span> top <span class="cm-number">2</span> * <span class="cm-keyword">from</span> NashvilleHousingMSSQL</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 92px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[6]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>Acreage</th>
+      <th>Address</th>
+      <th>Bedrooms</th>
+      <th>BuildingValue</th>
+      <th>City</th>
+      <th>ExteriorWall</th>
+      <th>FinishedArea</th>
+      <th>FoundationType</th>
+      <th>FullBath</th>
+      <th>Grade</th>
+      <th>...</th>
+      <th>SalePrice</th>
+      <th>SoldAsVacant</th>
+      <th>State</th>
+      <th>Suite/Condo#</th>
+      <th>TaxDistrict</th>
+      <th>TotalValue</th>
+      <th>Unnamed:0</th>
+      <th>Unnamed:0.1</th>
+      <th>YearBuilt</th>
+      <th>image</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.76</td>
+      <td>5316  OVERTON RD</td>
+      <td>4.0</td>
+      <td>300400.0</td>
+      <td>NASHVILLE</td>
+      <td>BRICK</td>
+      <td>2370.0</td>
+      <td>FULL BSMT</td>
+      <td>2.0</td>
+      <td>B</td>
+      <td>...</td>
+      <td>267300</td>
+      <td>No</td>
+      <td>TN</td>
+      <td>None</td>
+      <td>URBAN SERVICES DISTRICT</td>
+      <td>355400.0</td>
+      <td>24</td>
+      <td>24</td>
+      <td>1968.0</td>
+      <td>\184000\836001.JPG</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>...</td>
+      <td>207000</td>
+      <td>No</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>59</td>
+      <td>59</td>
+      <td>NaN</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+<p>2 rows × 31 columns</p>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">To view all your engines, use the <span class="cm-comment">`list`</span> argument:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>To view all your engines, use the <code>list</code> argument:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[7]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 118px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --engines</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">list</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[7]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>Alias</th>
+      <th>Engine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>PG</td>
+      <td>postgresql://username:@localhost/db</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>MSS</td>
+      <td>mssql+pymssql://SomeUserName:SomePassword@17...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>LC</td>
+      <td>mssql+pymssql://username:password@180.36.2.9...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">To clear your engines, use the <span class="cm-comment">`--refresh`</span> command like so:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>To clear your engines, use the <code>--refresh</code> command like so:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[4]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 118px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --refresh</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">engines</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[4]:</div><div class="output_subarea output_text output_result"><pre>'Removed all records from engines'</pre></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 33px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-2">## Defining and Persisting Hooks</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 63px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h2 id="Defining-and-Persisting-Hooks">Defining and Persisting Hooks<a class="anchor-link" href="#Defining-and-Persisting-Hooks">¶</a></h2>
+</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 79px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">One thing I tried to do with version 1 is mimic <span class="cm-comment">`psql`</span> commands (since I was using postgres exclusively), but doing that forced limitations on users who used other DBs. With this version, I'm removing those limitations by allowing users to register their own often-run shortcut queries like so:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 109px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>One thing I tried to do with version 1 is mimic <code>psql</code> commands (since I was using postgres exclusively), but doing that forced limitations on users who used other DBs. With this version, I'm removing those limitations by allowing users to register their own often-run shortcut queries like so:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[3]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none; bottom: 0px;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 480px; margin-bottom: 0px; border-right-width: 30px; min-height: 334px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --hook</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">tables MSS = USE {0};</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">SELECT</span> * <span class="cm-keyword">FROM</span> sys<span class="cm-variable-2">.Tables</span>;</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">columns_mss MSS = EXEC sp_columns {0};</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">columns_db1 DB1 = EXEC sp_columns {0};</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">views mssql+pymssql://username:password@hostname/DB = USE {0};</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">SELECT</span> * <span class="cm-keyword">FROM</span> sys<span class="cm-variable-2">.Views</span>;</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">tables_db1 DB1 = USE {0};</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">SELECT</span> * <span class="cm-keyword">FROM</span> sys<span class="cm-variable-2">.Tables</span>;</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">views_l mssql+pymssql://:@localhost/DB = USE {0};</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">SELECT</span> * <span class="cm-keyword">FROM</span> sys<span class="cm-variable-2">.Views</span>;</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">databases LC = <span class="cm-keyword">SELECT</span> name <span class="cm-keyword">FROM</span> master<span class="cm-variable-2">.sys.databases</span>;</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 364px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[3]:</div><div class="output_subarea output_text output_result"><pre>'Hook successfully registered'</pre></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 487px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code" style=""><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">The syntax for defining hooks is:</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-quote cm-quote-1">&gt; </span><span class="cm-comment cm-quote cm-quote-1">```</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">&lt;name&gt; &lt;engine|alias&gt; = &lt;sql command&gt;```</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">Take this example:</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">&gt;```</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">tables MSS = USE {0};</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">SELECT * FROM sys.Tables;</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">```</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">where </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">`tables`</span> is our command shortcut.</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">`MSS`</span> is an engine alias we have already defined with <span class="cm-comment">`--engines`</span>.</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">and </span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"> &nbsp; &nbsp;</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">```</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">USE {0};</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">SELECT * FROM sys.Tables;</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-comment">```</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">is the comand we want to run when we issue our shortcut.</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"> &nbsp; &nbsp;</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">To use your newly-defined shortcuts, prepend <span class="cm-comment">`~`</span> to your shortcut name:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 517px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>The syntax for defining hooks is:</p>
+<blockquote>
+<pre><code>&lt;name&gt; &lt;engine|alias&gt; = &lt;sql command&gt;
+</code></pre></blockquote>
+<p>Take this example:</p>
+<blockquote>
+<pre><code>tables MSS = USE {0};
+SELECT * FROM sys.Tables;
+</code></pre></blockquote>
+<p>where </p>
+<p><code>tables</code> is our command shortcut.</p>
+<p><code>MSS</code> is an engine alias we have already defined with <code>--engines</code>.</p>
+<p>and </p>
+<pre><code>USE {0};
+SELECT * FROM sys.Tables;
+</code></pre><p>is the comand we want to run when we issue our shortcut.</p>
+<p>To use your newly-defined shortcuts, prepend <code>~</code> to your shortcut name:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[8]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 264.672px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">~columns_mss NashvilleHousingMSSQL</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to unscroll output; double click to hide" style=""></div><div class="output " style=""><div class="output_area"><div class="prompt output_prompt">Out[8]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>CHAR_OCTET_LENGTH</th>
+      <th>COLUMN_DEF</th>
+      <th>COLUMN_NAME</th>
+      <th>DATA_TYPE</th>
+      <th>IS_NULLABLE</th>
+      <th>LENGTH</th>
+      <th>NULLABLE</th>
+      <th>ORDINAL_POSITION</th>
+      <th>PRECISION</th>
+      <th>RADIX</th>
+      <th>REMARKS</th>
+      <th>SCALE</th>
+      <th>SQL_DATA_TYPE</th>
+      <th>SQL_DATETIME_SUB</th>
+      <th>SS_DATA_TYPE</th>
+      <th>TABLE_NAME</th>
+      <th>TABLE_OWNER</th>
+      <th>TABLE_QUALIFIER</th>
+      <th>TYPE_NAME</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>Unnamed:0</td>
+      <td>-5</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>1</td>
+      <td>19</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>0.0</td>
+      <td>-5</td>
+      <td>None</td>
+      <td>108</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>bigint</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>Unnamed:0.1</td>
+      <td>-5</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>2</td>
+      <td>19</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>0.0</td>
+      <td>-5</td>
+      <td>None</td>
+      <td>108</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>bigint</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>ParcelID</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>3</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>LandUse</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>4</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>PropertyAddress</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>5</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>Suite/Condo#</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>6</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>PropertyCity</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>7</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>SaleDate</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>8</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>SalePrice</td>
+      <td>-5</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>9</td>
+      <td>19</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>0.0</td>
+      <td>-5</td>
+      <td>None</td>
+      <td>108</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>bigint</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>LegalReference</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>10</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>SoldAsVacant</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>11</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>MultipleParcelsInvolvedinSale</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>12</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>OwnerName</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>13</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>Address</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>14</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>City</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>15</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>State</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>16</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>Acreage</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>17</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>TaxDistrict</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>18</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>Neighborhood</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>19</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>image</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>20</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>LandValue</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>21</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>BuildingValue</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>22</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>TotalValue</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>23</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>FinishedArea</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>24</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>FoundationType</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>25</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>YearBuilt</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>26</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>ExteriorWall</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>27</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>2.147484e+09</td>
+      <td>None</td>
+      <td>Grade</td>
+      <td>-1</td>
+      <td>YES</td>
+      <td>2147483647</td>
+      <td>1</td>
+      <td>28</td>
+      <td>2147483647</td>
+      <td>NaN</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>-1</td>
+      <td>None</td>
+      <td>39</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>text</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>Bedrooms</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>29</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>FullBath</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>30</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>NaN</td>
+      <td>None</td>
+      <td>HalfBath</td>
+      <td>6</td>
+      <td>YES</td>
+      <td>8</td>
+      <td>1</td>
+      <td>31</td>
+      <td>15</td>
+      <td>10.0</td>
+      <td>None</td>
+      <td>NaN</td>
+      <td>6</td>
+      <td>None</td>
+      <td>109</td>
+      <td>NashvilleHousingMSSQL</td>
+      <td>dbo</td>
+      <td>tdobbins</td>
+      <td>float</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Since we defined <span class="cm-comment">`columns_mss`</span> as having an argument, <span class="cm-comment">`{0}`</span>, we can pass a table name to it.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>Since we defined <code>columns_mss</code> as having an argument, <code>{0}</code>, we can pass a table name to it.</p>
+</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">To view your hooks, use <span class="cm-comment">`list`</span>:</span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>To view your hooks, use <code>list</code>:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[10]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 95px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --hook</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">list</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[10]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>Alias</th>
+      <th>Engine</th>
+      <th>Hook</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>tables</td>
+      <td>mssql+pymssql://SomeUserName:SomePassword@17...</td>
+      <td>USE {0};\nSELECT * FROM sys.Tables;</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>columns_mss</td>
+      <td>mssql+pymssql://SomeUserName:SomePassword@17...</td>
+      <td>EXEC sp_columns {0};</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>columns_db1</td>
+      <td>mssql+pymssql://username:password@180.36.2.9...</td>
+      <td>EXEC sp_columns {0};</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>views</td>
+      <td>mssql+pymssql://username:password@180.36.2.9...</td>
+      <td>USE {0};\nSELECT * FROM sys.Views;</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>tables_db1</td>
+      <td>mssql+pymssql://username:password@180.36.2.9...</td>
+      <td>USE {0};\nSELECT * FROM sys.Tables;</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>views_l</td>
+      <td>mssql+pymssql://:@localhost/DB1</td>
+      <td>USE {0};\nSELECT * FROM sys.Views;</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>databases</td>
+      <td>mssql+pymssql://username:password@180.36.2.9...</td>
+      <td>SELECT name FROM master.sys.databases;</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">And to clear your hook list, just run <span class="cm-comment">`--refresh`</span> with <span class="cm-comment">`hooks`</span> as the cell content, like we did for engines:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>And to clear your hook list, just run <code>--refresh</code> with <code>hooks</code> as the cell content, like we did for engines:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[2]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 118px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --refresh</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">hooks</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[2]:</div><div class="output_subarea output_text output_result"><pre>'Removed all records from hooks'</pre></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 33px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-2">## Write SQL Output to Session Variable</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 63px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h2 id="Write-SQL-Output-to-Session-Variable">Write SQL Output to Session Variable<a class="anchor-link" href="#Write-SQL-Output-to-Session-Variable">¶</a></h2>
+</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">To write the output of your query to a Python variable, use the <span class="cm-comment">`--var`</span> argument.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>To write the output of your query to a Python variable, use the <code>--var</code> argument.</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[6]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 203px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --engine=LC --var=df</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">select</span> <span class="cm-number">1</span> <span class="cm-keyword">as</span> some_lc_column</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[6]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>some_lc_column</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[7]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 18px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">df</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[7]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>some_lc_column</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 33px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-header cm-header-2">## Background Queries</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 63px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><h2 id="Background-Queries">Background Queries<a class="anchor-link" href="#Background-Queries">¶</a></h2>
+</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">To run queries in the background, use the <span class="cm-comment">`--background`</span> flag:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>To run queries in the background, use the <code>--background</code> flag:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[8]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 364.656px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-magic">%%sql --engine=LC --var=another_df --background</span></span></pre><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-keyword">select</span> <span class="cm-number">1</span> <span class="cm-keyword">as</span> some_lc_column</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style="display: none;"></div><div class="output" style="display: none;"></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">Notice here that <span class="cm-comment">`another_df`</span> is undefined since the query is still running:</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>Notice here that <code>another_df</code> is undefined since the query is still running:</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[9]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 79.9688px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">another_df</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt"></div><div class="output_subarea output_text output_error"><pre><span class="ansired">---------------------------------------------------------------------------</span>
+<span class="ansired">NameError</span>                                 Traceback (most recent call last)
+<span class="ansigreen">&lt;ipython-input-9-135decb41fec&gt;</span> in <span class="ansicyan">&lt;module&gt;<span class="ansiblue"></span>
+<span class="ansigreen">----&gt; 1<span class="ansired"> </span>another_df<span class="ansiblue"></span><span class="ansiblue"></span>
+
+<span class="ansired">NameError</span>: name 'another_df' is not defined
+
+</span></span></pre></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">As soon as the query is done, you can call <span class="cm-comment">`another_df`</span> successfully.</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>As soon as the query is done, you can call <code>another_df</code> successfully.</p>
+</div></div></div><div class="cell code_cell un rendered" tabs="2"><div class="input"><div class="prompt input_prompt">In&nbsp;[11]:</div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-ipython"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; min-width: 79.9688px; margin-bottom: 0px; border-right-width: 30px; min-height: 28px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;"><span class="cm-variable">another_df</span></span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 58px;"></div></div></div></div></div></div><div class="widget-area" style="display: none;"><div class="prompt"><button class="close">×</button></div><div class="widget-subarea jp-Output-result"></div></div><div class="output_wrapper"><div class=" prompt" title="click to expand output; double click to hide output" style=""></div><div class="output" style=""><div class="output_area"><div class="prompt output_prompt">Out[11]:</div><div class="output_subarea output_html rendered_html output_result"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right">
+      <th></th>
+      <th>some_lc_column</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div></div><div class="btn btn-default output_collapsed" title="click to expand output" style="display: none;">. . .</div></div></div><div class="cell text_cell un rendered" tabs="2"><div class="prompt input_prompt"></div><div class="inner_cell"><div class="input_area"><div class="CodeMirror cm-s-default CodeMirror-wrap"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 5.59375px; left: 5.59375px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabs="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-vscrollbar" cm-not-content="true" style="bottom: 0px; width: 18px; pointer-events: none;"><div style="min-width: 1px; height: 0px;"></div></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabs="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; padding-right: 0px; padding-bottom: 0px; margin-bottom: 0px; border-right-width: 30px; min-height: 45px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines"><div style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-cursors"></div><div class="CodeMirror-code"><pre class=" CodeMirror-line "><span style="padding-right: 0.1px;">I'm working on a way to notify the user when a query finishes in the background. I'm also working on adding UI buttons using ipywidgets. Enjoy!</span></pre></div></div></div></div></div><div class="CodeMirror-gutters" style="display: none; height: 75px;"></div></div></div></div><div class="text_cell_render rendered_html" tabs="-1"><p>I'm working on a way to notify the user when a query finishes in the background. I'm also working on adding UI buttons using ipywidgets. Enjoy!</p>
+</div></div></div>
